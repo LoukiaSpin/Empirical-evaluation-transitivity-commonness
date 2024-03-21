@@ -17,11 +17,11 @@ remotes::install_github("https://github.com/LoukiaSpin/rnmamod.git", force = TRU
 ```
 
 ## Output 
-Prerequisite R packages: [rnmamod](https://CRAN.R-project.org/package=rnmamod), 
+Prerequisite R packages: [dplyr](https://CRAN.R-project.org/package=dplyr), 
+[ggdist](https://CRAN.R-project.org/package=ggdist),
+[gghalves](https://CRAN.R-project.org/package=gghalves),
 [ggplot2]( https://CRAN.R-project.org/package=ggplot2),
-[reshape2](https://CRAN.R-project.org/package=reshape2),
-[ggpubr](https://cran.r-project.org/web/packages/ggpubr/) 
-[plyr](https://CRAN.R-project.org/package=plyr) 
-[dplyr](https://CRAN.R-project.org/package=dplyr) 
-[gghalves](https://CRAN.R-project.org/package=gghalves), and
-[ggdist](https://CRAN.R-project.org/package=ggdist) 
+[ggpubr](https://cran.r-project.org/web/packages/ggpubr/),
+[plyr](https://CRAN.R-project.org/package=plyr),
+[reshape2](https://CRAN.R-project.org/package=reshape2), and
+[rnmamod](https://CRAN.R-project.org/package=rnmamod).
