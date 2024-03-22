@@ -1,8 +1,8 @@
 #*******************************************************************************
 #*
 #*
-#*                         Create Figure 1 of Manuscript                                               
-#*           (Schematic illustration of the proposed novel approach)                                  
+#*                       Creating Figure 1 of Manuscript                                                                                                                    
+#*              (Schematic illustration of the proposed approach)                                                            
 #*
 #* Author: Loukia M. Spineli 
 #* Date: March 2024
@@ -14,7 +14,7 @@
 
 
 ## Load libraries
-list.of.packages <- "rnmamod"
+library("rnmamod")
 
 
 ## Construct dataset

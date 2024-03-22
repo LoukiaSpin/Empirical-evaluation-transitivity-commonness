@@ -16,7 +16,7 @@ lapply(list.of.packages, require, character.only = TRUE); rm(list.of.packages)
 
 
 
-## Predictive distribution hyper parameter: placebo-comparisons and all outcomes ----
+## Predictive distribution hyper-parameters: placebo-comparison, moderately sized trials, all outcomes ----
 #' (distributions differ more substantially across the outcomes than intervention-comparators) 
 dataset_dist <- data.frame(outcome = c("Objective", "Semi-objective", "Subjective", "General"),
                            thresh_mean = c(-7.36, -2.83, -1.14, -1.85), 
@@ -166,7 +166,7 @@ general_out <-
         axis.title = element_text(size = 14, face = "bold"))
 
 # Bring all together
-tiff("./40_Analysis & Results/Figure 2.tiff", 
+tiff("./Figures/Figure 2.tiff", 
      height = 18, 
      width = 38, 
      units = "cm", 

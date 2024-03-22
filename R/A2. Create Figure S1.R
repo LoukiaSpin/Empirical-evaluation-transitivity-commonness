@@ -17,13 +17,13 @@ lapply(list.of.packages, require, character.only = TRUE); rm(list.of.packages)
 
 
 ## Load functions ----
-source("./40_Analysis & Results/Preparative Analyses/function.collection_function.R")
+source("./R/function.collection_function.R")
 
 
 
 ## Load datasets ----
 # TRACE-NMA dataset
-load("./41_R Dataset creation/TRACE-NMA Dataset.RData")
+load("./data/TRACE-NMA Dataset.RData")
 
 
 
@@ -32,10 +32,11 @@ load("./41_R Dataset creation/TRACE-NMA Dataset.RData")
 dataset_new0 <- get_dataset_new(read_all_excels)
 
 # Remove datasets with less than four characteristics (after removing dose-related characteristics)
-dataset_new <- dataset_new0[-c(61, 76, 87)] 
+remove <- which(unname(unlist(lapply(dataset_new0, function(x) dim(x)[2] - 3))) < 4)
+dataset_new <- dataset_new0[-remove] 
 
 # Include proper threshold to each dataset based on their design factors
-database_thresh <- dataset_threshold(dataset_new)
+database_thresh <- dataset_threshold(dataset_new)[, c(2, 7:8)]
 
 
 
@@ -50,7 +51,7 @@ data_bar_net_prop$intervention <- factor(data_bar_net_prop$intervention,
                                          levels = c("Pharma vs. Placebo", "Pharma vs. Pharma", "Non-pharma vs. Any"))
 
 # Get stacked barplot
-tiff("./40_Analysis & Results/Figure S1.tiff", 
+tiff("./Figures/Figure S1.tiff", 
      height = 20, 
      width = 37, 
      units = "cm", 

@@ -72,8 +72,7 @@ dataset_threshold <- function (dataset_new) {
   
   
   ## Load libraries ----
-  list.of.packages <- c("readxl", "dplyr")
-  lapply(list.of.packages, require, character.only = TRUE); rm(list.of.packages)
+  library( "dplyr")
 
   
   ## Load datasets ----
@@ -134,10 +133,10 @@ dataset_threshold <- function (dataset_new) {
       0.56, 0.35, 0.58, 0.01, 0.006, 0.01, 0.30, 0.18, 0.33)
   
   # Match network design factors with threshold and add 'threshold' column in 'list_extracted_networks'
-  list_extracted_networks$threshold_50 <- inner_join(data.frame(list_extracted_networks[, 2:3], 
+  list_extracted_networks$threshold_50 <- inner_join(data.frame(list_extracted_networks[, 7:8], 
                                                                 average_size = size_net_label), 
                                                      threshold_set[, -5])[, 4]
-  list_extracted_networks$threshold_75 <- inner_join(data.frame(list_extracted_networks[, 2:3], 
+  list_extracted_networks$threshold_75 <- inner_join(data.frame(list_extracted_networks[, 7:8], 
                                                                 average_size = size_net_label), 
                                                      threshold_set[, -4])[, 4]
   

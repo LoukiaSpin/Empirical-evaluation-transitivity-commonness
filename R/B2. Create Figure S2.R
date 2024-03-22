@@ -17,16 +17,16 @@ lapply(list.of.packages, require, character.only = TRUE); rm(list.of.packages)
 
 
 ## Load functions ----
-source("./40_Analysis & Results/Preparative Analyses/function.collection_function.R")
+source("./R/function.collection_function.R")
 
 
 
 ## Load datasets ----
 # TRACE-NMA dataset
-load("./41_R Dataset creation/TRACE-NMA Dataset.RData")
+load("./data/TRACE-NMA Dataset.RData")
 
 # Overall dissimilarity results 
-load("./40_Analysis & Results/Overall Dissimilarities_Results.RData")
+load("./data/Overall Dissimilarities_Results.RData")
 
 
 
@@ -35,7 +35,8 @@ load("./40_Analysis & Results/Overall Dissimilarities_Results.RData")
 dataset_new0 <- get_dataset_new(read_all_excels)
 
 # Remove datasets with less than four characteristics (after removing dose-related characteristics)
-dataset_new <- dataset_new0[-c(61, 76, 87)] 
+remove <- which(unname(unlist(lapply(dataset_new0, function(x) dim(x)[2] - 3))) < 4)
+dataset_new <- dataset_new0[-remove] 
 
 
 
