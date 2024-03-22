@@ -17,16 +17,16 @@ lapply(list.of.packages, require, character.only = TRUE); rm(list.of.packages)
 
 
 ## Load functions ----
-source("./40_Analysis & Results/Preparative Analyses/function.collection_function.R")
+source("./R/function.collection_function.R")
 
 
 
 ## Load datasets ----
 # TRACE-NMA dataset
-load("./41_R Dataset creation/TRACE-NMA Dataset.RData")
+load("./data/TRACE-NMA Dataset.RData")
 
 # Overall dissimilarity results 
-load("./40_Analysis & Results/Overall Dissimilarities_Results.RData")
+load("./data/Overall Dissimilarities_Results.RData")
 
 
 
@@ -35,10 +35,11 @@ load("./40_Analysis & Results/Overall Dissimilarities_Results.RData")
 dataset_new0 <- get_dataset_new(read_all_excels)
 
 # Remove datasets with less than four characteristics (after removing dose-related characteristics)
-dataset_new <- dataset_new0[-c(61, 76, 87)] 
+remove <- which(unname(unlist(lapply(dataset_new0, function(x) dim(x)[2] - 3))) < 4)
+dataset_new <- dataset_new0[-remove] 
 
 # Include proper threshold to each dataset based on their design factors
-database_thresh <- dataset_threshold(dataset_new)
+database_thresh <- dataset_threshold(dataset_new)[, c(2, 7:8, 11:12)]
 
 
 
@@ -61,7 +62,7 @@ num_comp_net <- unlist(lapply(comp_diss_mat, function(x) length(na.omit(diag(x))
 # Total number of non-single-study comparisons
 total_comp <- sum(num_comp_net)
 
-# Within-comparison dissimilarities
+# Within-comparison dissimilarities (only non-single-study comparisons)
 within_data <- unname(unlist(lapply(comp_diss_mat, function(x) na.omit(diag(x)))))
 
 # Include the network ID 
@@ -89,7 +90,7 @@ data_plot$interv_comp <- factor(data_plot$interv_comp,
                                 levels = c("Pharma vs. Placebo", "Pharma vs. Pharma", "Non-pharma vs. Any"))
 
 # Violin plot of within-comparison dissimilarity
-tiff("./40_Analysis & Results/Figure S4.tiff", 
+tiff("./Figures/Figure S4.tiff", 
      height = 20, 
      width = 37, 
      units = "cm", 
@@ -100,9 +101,6 @@ ggplot(data_plot,
            y = round(within_data, 2))) + 
   stat_halfeye(fill = scales::hue_pal()(5)[-c(1:3, 5)],
                .width = c(0.50, 0.95)) + 
-  #geom_half_point(side = "l", 
-  #                range_scale = .2, 
-  #                alpha = .5) +
   stat_summary(aes(label = sprintf("%.2f", after_stat(y))),
                fun = "median", 
                colour = "black", 
@@ -185,7 +183,7 @@ thres_within_plot <- data.frame(rbind(thres_within_50, thres_within_75),
 colnames(thres_within_plot)[6] <- "threshold"
 
 # Create grouped barplot 
-tiff("./40_Analysis & Results/Figure S5.tiff", 
+tiff("./Figures/Figure S5.tiff", 
      height = 25, 
      width = 37, 
      units = "cm", 
