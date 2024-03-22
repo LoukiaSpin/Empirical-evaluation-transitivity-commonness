@@ -17,16 +17,16 @@ lapply(list.of.packages, require, character.only = TRUE); rm(list.of.packages)
 
 
 ## Load functions ----
-source("./40_Analysis & Results/Preparative Analyses/function.collection_function.R")
+source("./R/function.collection_function.R")
 
 
 
 ## Load datasets ----
 # TRACE-NMA dataset
-load("./41_R Dataset creation/TRACE-NMA Dataset.RData")
+load("./data/TRACE-NMA Dataset.RData")
 
 # Overall dissimilarity results 
-load("./40_Analysis & Results/Overall Dissimilarities_Results.RData")
+load("./data/Overall Dissimilarities_Results.RData")
 
 
 
@@ -35,10 +35,11 @@ load("./40_Analysis & Results/Overall Dissimilarities_Results.RData")
 dataset_new0 <- get_dataset_new(read_all_excels)
 
 # Remove datasets with less than four characteristics (after removing dose-related characteristics)
-dataset_new <- dataset_new0[-c(61, 76, 87)] 
+remove <- which(unname(unlist(lapply(dataset_new0, function(x) dim(x)[2] - 3))) < 4)
+dataset_new <- dataset_new0[-remove] 
 
 # Include proper threshold to each dataset based on their design factors
-database_thresh <- dataset_threshold(dataset_new)
+database_thresh <- dataset_threshold(dataset_new)[, c(2, 7:8, 11:12)]
 
 
 
@@ -147,7 +148,7 @@ transit_plot <- data.frame(rbind(transit_50, transit_75),
 colnames(transit_plot)[6] <- "threshold"
 
 # Create grouped barplot 
-tiff("./40_Analysis & Results/Figure 3.tiff", 
+tiff("./Figures/Figure 3.tiff", 
      height = 24, 
      width = 37, 
      units = "cm", 
@@ -184,42 +185,6 @@ dev.off()
 
 
 
-## Commonness of *transitivity* by outcome and intervention-comparator (Figure 4) ----
-# 50% threshold: % *networks* with 'transitivity' and 'probably intransitivity' 
-transit_50 <-
-  data.frame(network_id, outcome, interv_comp, between_data, threshold_median) %>%
-  mutate(decision = if_else(between_data < threshold_median, "low", "probably concerning")) %>%
-  group_by(network_id, outcome, interv_comp) %>%
-  count(network_id, outcome, interv_comp, decision, .drop = FALSE) %>%
-  mutate(freq = round((n / sum(n)) * 100, 2)) %>%  
-  filter(!is.na(decision)) %>%
-  mutate(transitivity = factor(if_else(decision == "low" & freq == 100, "transitivity", "probably intransitivity"), levels = c("transitivity", "probably intransitivity"))) %>%
-  distinct(network_id, .keep_all = TRUE) %>%
-  group_by(outcome, interv_comp) %>%
-  count(transitivity, .drop = FALSE) %>%
-  mutate(freq = round((n / sum(n)) * 100, 2))
-
-# 75% threshold: % *networks* with 'transitivity' and 'probably intransitivity'
-transit_75 <-
-  data.frame(network_id, outcome, interv_comp, between_data, threshold_75qrt) %>%
-  mutate(decision = if_else(between_data < threshold_75qrt, "low", "probably concerning")) %>%
-  group_by(network_id, outcome, interv_comp) %>%
-  count(network_id, outcome, interv_comp, decision, .drop = FALSE) %>%
-  mutate(freq = round((n / sum(n)) * 100, 2)) %>%  
-  filter(!is.na(decision)) %>%
-  mutate(transitivity = factor(if_else(decision == "low" & freq == 100, "transitivity", "probably intransitivity"), levels = c("transitivity", "probably intransitivity"))) %>%
-  distinct(network_id, .keep_all = TRUE) %>%
-  group_by(outcome, interv_comp) %>%
-  count(transitivity, .drop = FALSE) %>%
-  mutate(freq = round((n / sum(n)) * 100, 2))
-
-# Merge '50% threshold' and '75% threshold'
-transit_plot <- data.frame(rbind(transit_50, transit_75),
-                           rep(c("Second quartile", "Third quartile"), c(dim(transit_50)[1], dim(transit_75)[1])))
-colnames(transit_plot)[6] <- "threshold"
-
-
-
 ## Commonness of 'low' D_B among networks with 'intransitivity' by outcome and intervention-comparator (Figure 4) ----
 # 50% threshold: % *networks* with 'transitivity' and 'probably intransitivity' 
 intransit_comp_50 <-
@@ -232,14 +197,14 @@ intransit_comp_50 <-
   mutate(transitivity = factor(if_else(decision == "low" & freq < 100 | decision == "probably concerning", "probably intransitivity", "transitivity"), levels = c("transitivity", "probably intransitivity"))) %>%
   filter(transitivity == "probably intransitivity")
 
-# Number of networks with '50% threshold' by decision, outcome and intervetion-comparator
+# Number of networks with '50% threshold' by decision, outcome and intervention-comparator
 num_intrans_net_50 <- 
   intransit_comp_50 %>%
   group_by(outcome, interv_comp) %>%
   count(decision)
 
 # Number of intransitive network with '50% threshold' (ALL!!)
-length(table(intransit_comp_50$network_id))  # 217
+length(table(intransit_comp_50$network_id))  # 214
 
 # 75% threshold: % *networks* with 'transitivity' and 'probably intransitivity' 
 intransit_comp_75 <-
@@ -259,7 +224,7 @@ num_intrans_net_75 <-
   count(decision)
 
 # Number of intransitive network with '75% threshold'
-length(table(intransit_comp_75$network_id))  # 192 (88%)
+length(table(intransit_comp_75$network_id))  # 188 (87.8%)
 
 # Merge '50% threshold' and '75% threshold'
 intransit_comp_plot <- data.frame(rbind(intransit_comp_50, intransit_comp_75),
@@ -278,7 +243,7 @@ intransit_bars <- transit_plot %>%
   filter(transitivity == "probably intransitivity")
 
 # Get dot plot with background bars
-tiff("./40_Analysis & Results/Figure 4.tiff", 
+tiff("./Figures/Figure 4.tiff", 
      height = 24, 
      width = 37, 
      units = "cm", 

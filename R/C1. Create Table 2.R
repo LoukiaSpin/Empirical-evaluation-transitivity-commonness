@@ -19,9 +19,6 @@ source("./R/function.collection_function.R")
 # TRACE-NMA dataset
 load("./data/TRACE-NMA Dataset.RData")
 
-# Overall dissimilarity results 
-#load("./data/Overall Dissimilarities_Results.RData")
-
 
 
 ## Dataset preparation ----
