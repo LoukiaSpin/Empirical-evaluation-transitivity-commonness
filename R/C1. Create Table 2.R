@@ -11,16 +11,16 @@
 
 
 ## Load functions ----
-source("./40_Analysis & Results/Preparative Analyses/function.collection_function.R")
+source("./R/function.collection_function.R")
 
 
 
 ## Load datasets ----
 # TRACE-NMA dataset
-load("./41_R Dataset creation/TRACE-NMA Dataset.RData")
+load("./data/TRACE-NMA Dataset.RData")
 
 # Overall dissimilarity results 
-load("./40_Analysis & Results/Overall Dissimilarities_Results.RData")
+#load("./data/Overall Dissimilarities_Results.RData")
 
 
 
@@ -29,7 +29,8 @@ load("./40_Analysis & Results/Overall Dissimilarities_Results.RData")
 dataset_new0 <- get_dataset_new(read_all_excels)
 
 # Remove datasets with less than four characteristics (after removing dose-related characteristics)
-dataset_new <- dataset_new0[-c(61, 76, 87)] 
+remove <- which(unname(unlist(lapply(dataset_new0, function(x) dim(x)[2] - 3))) < 4)
+dataset_new <- dataset_new0[-remove] 
 
 
 
@@ -41,21 +42,21 @@ summary(num_studies)
 # Number of interventions
 num_interv <- sapply(dataset_new, function(x) length(unique(unlist(x[, 2:3]))))
 summary(num_interv)
-which(num_interv == 3) # One network with three interventions
+which(num_interv == 3) # One network with three interventions (see note (a) in Table 2)
 
 # Percentage of observed comparisons
 num_obs_comp <- sapply(dataset_new, function(x) length(unique(paste(x[, 3], "vs", x[, 2]))))
 perc_obs_comp <- round((num_obs_comp / 
                           sapply(num_interv, function(x) dim(combn(x, 2))[2])) * 100, 0)
 summary(perc_obs_comp)
-summary(perc_obs_comp[perc_obs_comp < 100])
+summary(perc_obs_comp[perc_obs_comp < 100]) # Excluding the 3 fully connected networks
 which(perc_obs_comp == 100) # Three fully connected networks
 
 # Percentage of single-study comparisons
 num_single_comp <- sapply(dataset_new, 
                           function(x) length(which(table(paste(x[, 3], "vs", x[, 2])) == 1)))
 perc_single_comp <- round((num_single_comp / num_obs_comp) * 100, 0)
-summary(perc_single_comp[perc_single_comp > 0])
+summary(perc_single_comp[perc_single_comp > 0]) # Excluding datasets without single-study comparisons
 which(perc_single_comp == 100) # One network with only single-study comparisons (Exclude from subsequent analyses)
 length(dataset_new) - length(which(perc_single_comp == 0)) # Networks with at least one single-study comparisons
 
@@ -81,16 +82,16 @@ length(which(perc_nonnumer_chars == 100)) # 1 network contained only non-numeric
 length(which(perc_nonnumer_chars == 0))   # 26 networks did not contain any non-numeric characteristics
 
 # Percentage of total missing data
-perc_miss_total <- round(as.numeric(lapply(dissimilarities, 
-                                           function(x) as.numeric(gsub("%", "", x$Total_missing)))), 1)
-summary(perc_miss_total[perc_miss_total > 0])
+perc_miss_total <- 
+  unname(unlist(lapply(dataset_new, 
+                       function(x) round(length(which(is.na(x[, -c(1:3)]) == TRUE)) / prod(dim(x[, -c(1:3)])) * 100, 1))))
+summary(perc_miss_total[perc_miss_total > 0]) # Excluding datasets without missing data
 length(dataset_new) - length(which(perc_miss_total == 0)) # 177 networks with at least one missing case
 
 # Percentage of missing data per characteristic
 num_miss_char <- sapply(dataset_new, function(x) colSums(is.na(x[, -c(1, 3)]))) 
 perc_miss_char <- 
-  round(as.numeric(unlist(num_miss_char)) / unlist(sapply(dataset_new, 
-                                                          function(x) rep(dim(x)[1], dim(x[, -c(1, 3)])[2]))) * 100, 1)
+  unname(unlist(sapply(dataset_new, function(x) round((colSums(is.na(x[, -c(1:3)])) / dim(x)[1]) * 100, 1))))
 summary(perc_miss_char[perc_miss_char > 0])
 
 # Percentage of characteristics with at least one missing case
@@ -109,7 +110,7 @@ dropped_char_list <-
     }) 
   })
 
-#' Vector of unique dropped characteristics per dataset
+#' Vector of the nuber of unique dropped characteristics per dataset
 dropped_char <- as.numeric(lapply(dropped_char_list, function(x) if (length(unique(unlist(x))) == 0) {
   0
 } else {
@@ -119,4 +120,4 @@ dropped_char <- as.numeric(lapply(dropped_char_list, function(x) if (length(uniq
 #' Get the descriptive statistics
 perc_dropped_char <- round((dropped_char / num_chars) * 100, 0)
 summary(dropped_char[dropped_char > 0])
-length(dropped_char[dropped_char > 0]) # 124 networks with at least one dropped characteristic
+length(dropped_char[dropped_char > 0]) # 125 networks with at least one dropped characteristic
