@@ -17,16 +17,16 @@ lapply(list.of.packages, require, character.only = TRUE); rm(list.of.packages)
 
 
 ## Load functions ----
-source("./40_Analysis & Results/Preparative Analyses/function.collection_function.R")
+source("./R/function.collection_function.R")
 
 
 
 ## Load datasets ----
 # TRACE-NMA dataset
-load("./41_R Dataset creation/TRACE-NMA Dataset.RData")
+load("./data/TRACE-NMA Dataset.RData")
 
 # Overall dissimilarity results 
-load("./40_Analysis & Results/Overall Dissimilarities_Results.RData")
+load("./data/Overall Dissimilarities_Results.RData")
 
 
 
@@ -35,31 +35,26 @@ load("./40_Analysis & Results/Overall Dissimilarities_Results.RData")
 dataset_new0 <- get_dataset_new(read_all_excels)
 
 # Remove datasets with less than four characteristics (after removing dose-related characteristics)
-dataset_new <- dataset_new0[-c(61, 76, 87)] 
+remove <- which(unname(unlist(lapply(dataset_new0, function(x) dim(x)[2] - 3))) < 4)
+dataset_new <- dataset_new0[-remove] 
 
 # Include proper threshold to each dataset based on their design factors
-database_thresh <- dataset_threshold(dataset_new)
+database_thresh <- dataset_threshold(dataset_new)[, c(2, 7:8, 11:12)]
 
 
 
 ## Prepare dataset by outcome and intervention-comparator type ----
-# Insert 'Comparison' in the dataset (control appears second in the compar.)
-insert_comp <- lapply(dataset_new, function(x) {x$Comparison <- as.character(paste0(x$treat2, "-", x$treat1)); x})
-
-# Single-study comparisons
-single_study_comp <- lapply(insert_comp, function(x) names(which(table(x$Comparison) == 1)))
-
-# Find the single-study comparisons and set diagonal with 'NA'
-comp_diss_mat <- lapply(1:length(dissimilarities), function(x) {if (length(unlist(single_study_comp[x])) > 0) diag(dissimilarities[[x]]$Comparisons_diss_table)[unname(unlist(single_study_comp[x]))] <- NA else dissimilarities[[x]]$Comparisons_diss_table; dissimilarities[[x]]$Comparisons_diss_table})
+# Number of comparisons per network
+num_comp <- lapply(dissimilarities, function(x) dim(x$Comparisons_diss_table)[1])
 
 # Number of pairs of comparisons per network
-num_comp_net <- unlist(lapply(comp_diss_mat, function(x) length(x[lower.tri(x)])))
+num_comp_net <- unlist(lapply(num_comp, function(x) dim(combn(x, 2))[2]))
 
 # Total number of pairs of comparisons
 total_comp <- sum(num_comp_net)
 
 # Between-comparison dissimilarities
-between_data <- unname(unlist(lapply(comp_diss_mat, function(x) x[lower.tri(x)])))
+between_data <- unname(unlist(lapply(dissimilarities, function(x) x$Comparisons_diss_table[lower.tri(x$Comparisons_diss_table)])))
 
 # Include the network ID 
 network_id <- rep(1:length(dataset_new), num_comp_net)
@@ -86,7 +81,7 @@ data_plot$interv_comp <- factor(data_plot$interv_comp,
                                 levels = c("Pharma vs. Placebo", "Pharma vs. Pharma", "Non-pharma vs. Any"))
 
 # Violin plot of between-comparison dissimilarity
-tiff("./40_Analysis & Results/Figure S6.tiff", 
+tiff("./Figures/Figure S6.tiff", 
      height = 20, 
      width = 37, 
      units = "cm", 
@@ -155,7 +150,7 @@ thres_between_plot <- data.frame(rbind(thres_between_50, thres_between_75),
 colnames(thres_between_plot)[6] <- "threshold"
 
 # Create grouped barplot 
-tiff("./40_Analysis & Results/Figure S7.tiff", 
+tiff("./Figures/Figure S7.tiff", 
      height = 24, 
      width = 37, 
      units = "cm", 
