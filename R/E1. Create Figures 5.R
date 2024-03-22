@@ -17,16 +17,16 @@ lapply(list.of.packages, require, character.only = TRUE); rm(list.of.packages)
 
 
 ## Load functions ----
-source("./40_Analysis & Results/Preparative Analyses/function.collection_function.R")
+source("./R/function.collection_function.R")
 
 
 
 ## Load datasets ----
 # TRACE-NMA dataset
-load("./41_R Dataset creation/TRACE-NMA Dataset.RData")
+load("./data/TRACE-NMA Dataset.RData")
 
 # Overall dissimilarity results 
-load("./40_Analysis & Results/Overall Dissimilarities_Results.RData")
+load("./data/Overall Dissimilarities_Results.RData")
 
 
 
@@ -35,7 +35,9 @@ load("./40_Analysis & Results/Overall Dissimilarities_Results.RData")
 dataset_new0 <- get_dataset_new(read_all_excels)
 
 # Remove datasets with less than four characteristics (after removing dose-related characteristics)
-dataset_new <- dataset_new0[-c(61, 76, 87)] 
+remove <- which(unname(unlist(lapply(dataset_new0, function(x) dim(x)[2] - 3))) < 4)
+dataset_new <- dataset_new0[-remove] 
+
 
 #' Remove characteristics with missing data that 'comp_clustering' function
 #' would also remove so that I use the same data as for the novel approach
@@ -46,22 +48,25 @@ names(dataset_test) <- names(dataset_new)
 #' (Error: 'not enough observations') and 'chisq.test' warns 'Chi-squared approximation may be incorrect' 
 dataset_tests_final0 <- Filter(function(x) {length(which(table(x[, "Comparison"]) == 1)) == 0}, dataset_test)
 
-# Number of datasets removed from previous step
+# Number of datasets removed from previous step (they have at least one single-study comparison)
 length(dataset_test) - length(dataset_tests_final0) # 183 datasets!!
 
-#' Lastly, remove categorical characteristics with only one value, as 'chisq.test' is undefined (X-squared = NaN)
+#' Lastly, remove categorical characteristics with only one value for all trials, as 'chisq.test' is undefined (X-squared = NaN)
 dataset_tests_final <- 
   lapply(dataset_tests_final0, function(x) {x <- x[,!(names(x) %in% names(which(apply(x[-c(1:3)], 2, function(y) length(unique(y))) == 1)))]; x})
 
 # Vector of removed characteristics per analysed dataset
-chars_removed_per_dataset <- 
+chars_removed_per_dataset0 <- 
   unname(unlist(lapply(dataset_tests_final0, function(x) dim(x)[2])) - 
            unlist(lapply(dataset_tests_final, function(x) dim(x)[2])))
 
-# Descriptive statistics on non-zero removed characteristics
+# SOS: Exclude the 16th dataset that had one numeric variable with same values across all studies
+chars_removed_per_dataset <- chars_removed_per_dataset0[-16]
+
+# Descriptive statistics on removed categorical characteristics with same valua in all trials
 sum(chars_removed_per_dataset)
 summary(chars_removed_per_dataset[chars_removed_per_dataset > 0]) # 1 to 8 characteristics were removed ...
-length(chars_removed_per_dataset[chars_removed_per_dataset > 0])  # ... from 13 datasets
+length(chars_removed_per_dataset[chars_removed_per_dataset > 0])  # ... from 12 datasets
 
 
 
@@ -92,19 +97,19 @@ capture_warning <-
                                 myTryCatch(chisq.test(y[, x], y[, "Comparison"]))$warning))
 
 # Number of characteristics with warning per network
-num_chars_with_warnings <- unname(unlist(lapply(capture_warning, function(y) length(which(!is.na(y) == TRUE)))))
+#num_chars_with_warnings <- unname(unlist(lapply(capture_warning, function(y) length(which(!is.na(y) == TRUE)))))
 
 # number of networks with at least one characteristic with warning
-length(num_chars_with_warnings[num_chars_with_warnings > 0])
+#length(num_chars_with_warnings[num_chars_with_warnings > 0])
 
 # Number of characteristics per network 
 num_chars_initial <- unname(unlist(lapply(dataset_tests_final, function(x) dim(x[, -c(1:3)])[2] - 1)))
 
 # % characteristics with warning per network
-perc_chars_with_warnings <- num_chars_with_warnings/num_chars_initial
+#perc_chars_with_warnings <- num_chars_with_warnings/num_chars_initial
 
 # Descriptives
-summary(perc_chars_with_warnings[perc_chars_with_warnings > 0])
+#summary(perc_chars_with_warnings[perc_chars_with_warnings > 0])
 
 
 
