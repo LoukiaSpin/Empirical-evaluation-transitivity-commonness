@@ -17,16 +17,16 @@ lapply(list.of.packages, require, character.only = TRUE); rm(list.of.packages)
 
 
 ## Load functions ----
-source("./40_Analysis & Results/Preparative Analyses/function.collection_function.R")
+source("R/function.collection_function.R")
 
 
 
 ## Load datasets ----
 # TRACE-NMA dataset
-load("./41_R Dataset creation/TRACE-NMA Dataset.RData")
+load("./data/TRACE-NMA Dataset.RData")
 
 # Overall dissimilarity results 
-load("./40_Analysis & Results/Overall Dissimilarities_Results.RData")
+load("./data/Overall Dissimilarities_Results.RData")
 
 
 
@@ -35,18 +35,19 @@ load("./40_Analysis & Results/Overall Dissimilarities_Results.RData")
 dataset_new0 <- get_dataset_new(read_all_excels)
 
 # Remove datasets with less than four characteristics (after removing dose-related characteristics)
-dataset_new <- dataset_new0[-c(61, 76, 87)] 
+remove <- which(unname(unlist(lapply(dataset_new0, function(x) dim(x)[2] - 3))) < 4)
+dataset_new <- dataset_new0[-remove] 
 
 # Include proper threshold to each dataset based on their design factors
-database_thresh <- dataset_threshold(dataset_new)
+database_thresh <- dataset_threshold(dataset_new)[, c(2, 7:8, 11:12)]
 
 
 
 ## Prepare dataset by outcome and intervention-comparator type ----
-# Get DD distribution: Remove diagonals that are zero
+# Get GD distribution: Remove diagonals that are zero
 gower_res0 <- lapply(dissimilarities, function(x) {diag(x$Trials_diss_table) <- NA; x$Trials_diss_table})
 
-# Get DD distribution: Turn into vector and remove 'NA'
+# Get GD distribution: Turn into vector and remove 'NA'
 gower_res <- unname(unlist(lapply(gower_res0, function(x) na.omit(as.vector(x)))))
 
 # Possible pairs of trials per network
@@ -77,7 +78,7 @@ data_gower_plot$interv_gower <- factor(data_gower_plot$interv_gower,
                                        levels = c("Pharma vs. Placebo", "Pharma vs. Pharma", "Non-pharma vs. Any"))
 
 # Violin plot 
-tiff("./40_Analysis & Results/Figure S3.tiff", 
+tiff("./Figures/Figure S3.tiff", 
      height = 20, 
      width = 37, 
      units = "cm", 
@@ -156,9 +157,10 @@ left_join(count_zero_GD_net, total_GD_net, by = "network_id") %>%
             max = round(quantile(prop, 1.0), 2))
 
 # Number of networks with at least one zero Gower (manuscript)
-networks_zero_GD_total <- count_zero_GD_net %>%
+networks_zero_GD_total <- 
+  count_zero_GD_net %>%
   summarise(n = sum(n > 1),
-            prop = (n / length(dataset_new) * 100)) # n=73, prop=33.6%
+            prop = (n / length(dataset_new) * 100)) # n=75 (35%)
 
 
 
@@ -188,7 +190,7 @@ prop_zero_GD <-
 # Number of networks with at least one zero GD 
 networks_zero_GD <- count_zero_GD %>%
   group_by(outcome_gower, interv_gower) %>% 
-  summarise(n = sum(n > 1))
+  summarise(n = sum(n > 0))
 
 # % of networks with at least one zero GD per outcome and intervention-comparator (Table S3)
 left_join(networks_zero_GD, number_networks, by = c("outcome_gower", "interv_gower")) %>%
