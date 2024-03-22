@@ -40,44 +40,14 @@ dataset_new <- dataset_new0[-remove]
 
 
 
-## Obtain the within-comparison and between comparison dissimilarities ----
-# Insert 'Comparison' in the dataset (control appears second in the compar.)
-insert_comp <- lapply(dataset_new, function(x) {x$Comparison <- as.character(paste0(x$treat2, "-", x$treat1)); x})
-
-# Single-study comparisons
-single_study_comp <- lapply(insert_comp, function(x) names(which(table(x$Comparison) == 1)))
-
-# Find the single-study comparisons and set diagonal with 'NA'
-comp_diss_mat <- lapply(1:length(dissimilarities), function(x) {if (length(unlist(single_study_comp[x])) > 0) diag(dissimilarities[[x]]$Comparisons_diss_table)[unname(unlist(single_study_comp[x]))] <- NA else dissimilarities[[x]]$Comparisons_diss_table; dissimilarities[[x]]$Comparisons_diss_table})
-
-# Number of non-single-study comparisons per network
-num_comp_net <- unlist(lapply(comp_diss_mat, function(x) length(na.omit(diag(x)))))
-
-# Number of pairs of comparisons per network
-num_pair_comp_net <- unlist(lapply(comp_diss_mat, function(x) length(x[lower.tri(x)])))
-
-# Within-comparison dissimilarities
-within_data <- unname(unlist(lapply(comp_diss_mat, function(x) na.omit(diag(x)))))
-
-# Between-comparison dissimilarities
-between_data <- unname(unlist(lapply(comp_diss_mat, function(x) x[lower.tri(x)])))
-
-
-
-## Obtain the number of characteristics per network
+## Obtain the number of characteristics per network ----
 num_chars <- unname(unlist(lapply(dataset_new, function(x) dim(x[, -c(1:3)])[2])))
-
-# Repeat 'num_chars' based on 'num_comp_net' (Within-comparison dissimilarities)
-num_chars_within <- rep(num_chars, num_comp_net)
-
-# Repeat 'num_chars' based on 'num_pair_comp_net' (Between-comparison dissimilarities)
-num_chars_between <- rep(num_chars, num_pair_comp_net)
 
 
 
 ## Create histogram with dot and density ----
 #' The boxplot shows the median and IQR
-tiff("./40_Analysis & Results/Figure S2.tiff", 
+tiff("./Figures/Figure S2.tiff", 
      height = 20, 
      width = 37, 
      units = "cm", 
@@ -86,7 +56,6 @@ tiff("./40_Analysis & Results/Figure S2.tiff",
 ggplot(data.frame(num_chars),
        aes(x = num_chars, 
            y = 0)) + 
-  #stat_halfeye(fill = scales::hue_pal()(5)[-c(1:4)]) + 
   stat_histinterval(slab_color = "gray70", 
                     interval_colour = "black",
                     interval_alpha = 1,
