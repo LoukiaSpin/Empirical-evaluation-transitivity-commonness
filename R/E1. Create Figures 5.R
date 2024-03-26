@@ -32,16 +32,23 @@ load("./data/Overall Dissimilarities_Results.RData")
 
 ## Dataset preparation ----
 # Get 'dataset_new'
-dataset_new0 <- get_dataset_new(read_all_excels)
+dataset_new00 <- get_dataset_new(read_all_excels)
 
 # Remove datasets with less than four characteristics (after removing dose-related characteristics)
-remove <- which(unname(unlist(lapply(dataset_new0, function(x) dim(x)[2] - 3))) < 4)
-dataset_new <- dataset_new0[-remove] 
+remove <- which(unname(unlist(lapply(dataset_new00, function(x) dim(x)[2] - 3))) < 4)
+dataset_new0 <- dataset_new00[-remove] 
 
+# Remove also datasets with less than four characteristics after removing dropped characteristics
+#' (based on the 'comp_clustering' function of rnmamod)
+excluded_datasets <- dataset_tests(dataset_new0)$exclude_datasets
+dataset_new <- dataset_new0[-excluded_datasets] 
+
+# Reduce the list of 'comp_clustering' results to those from the analysed 209 datasets
+dissimilarities <- dissimilarities[-excluded_datasets]
 
 #' Remove characteristics with missing data that 'comp_clustering' function
 #' would also remove so that I use the same data as for the novel approach
-dataset_test <- dataset_tests(dataset_new)
+dataset_test <- dataset_tests(dataset_new0)$dataset_new_final
 names(dataset_test) <- names(dataset_new)
 
 #' Next, remove datasets with at least one single-study comparison as 'oneway.test' cannot run 
@@ -49,7 +56,7 @@ names(dataset_test) <- names(dataset_new)
 dataset_tests_final0 <- Filter(function(x) {length(which(table(x[, "Comparison"]) == 1)) == 0}, dataset_test)
 
 # Number of datasets removed from previous step (they have at least one single-study comparison)
-length(dataset_test) - length(dataset_tests_final0) # 183 datasets!!
+length(dataset_test) - length(dataset_tests_final0) # 178 datasets!!
 
 #' Lastly, remove categorical characteristics with only one value for all trials, as 'chisq.test' is undefined (X-squared = NaN)
 dataset_tests_final <- 
@@ -96,24 +103,12 @@ capture_warning <-
                               myTryCatch(oneway.test(y[, x] ~ y[, "Comparison"], var.equal = FALSE))$warning else 
                                 myTryCatch(chisq.test(y[, x], y[, "Comparison"]))$warning))
 
-# Number of characteristics with warning per network
-#num_chars_with_warnings <- unname(unlist(lapply(capture_warning, function(y) length(which(!is.na(y) == TRUE)))))
-
-# number of networks with at least one characteristic with warning
-#length(num_chars_with_warnings[num_chars_with_warnings > 0])
-
-# Number of characteristics per network 
-num_chars_initial <- unname(unlist(lapply(dataset_tests_final, function(x) dim(x[, -c(1:3)])[2] - 1)))
-
-# % characteristics with warning per network
-#perc_chars_with_warnings <- num_chars_with_warnings/num_chars_initial
-
-# Descriptives
-#summary(perc_chars_with_warnings[perc_chars_with_warnings > 0])
-
 
 
 ## % Characteristics with NaN p-value (one-way ANOVA) per network ----
+# Number of characteristics per network 
+num_chars_initial <- unname(unlist(lapply(dataset_tests_final, function(x) dim(x[, -c(1:3)])[2] - 1)))
+
 # Number of undefined F-tests (one-way ANOVA) per network
 num_undefined_ftests_net <- unname(unlist(lapply(test_type_results, function(x) length(which(is.na(x[, 1]) == TRUE)))))
 
@@ -133,7 +128,7 @@ length(num_undefined_ftests_net[num_undefined_ftests_net > 0])
 perc_chars_analysed <- (num_chars_initial - num_undefined_ftests_net) / num_chars_initial
 
 # Descriptives
-summary(perc_chars_analysed[perc_chars_analysed < 1])
+round(summary(perc_chars_analysed[perc_chars_analysed < 1]) * 100, 1)
 
 # Number of networks with less characteristics than originally
 length(perc_chars_analysed[perc_chars_analysed < 1])
@@ -290,7 +285,7 @@ barplot_third <-
         legend.title = element_text(size = 14, face = "bold"))
 
 # Bring together and save Figure 5
-tiff("./40_Analysis & Results/Figure 5.tiff", 
+tiff("./Figures/Figure 5.tiff", 
      height = 18, 
      width = 38, 
      units = "cm", 
