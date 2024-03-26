@@ -36,6 +36,8 @@ get_dataset_new <- function (read_all_excels) {
 #' are removed from 'comp_clustering' function. The dataset is used to apply
 #' statistical tests for transitivity evaluation
 dataset_tests <- function (dataset) {
+  
+  
   ## Insert 'Comparison' in the dataset (control appears second in the compar.)
   dataset_new <- lapply(dataset, function(x) {x$Comparison <- as.character(paste0(x$treat2, "-", x$treat1)); x})
   
@@ -59,12 +61,34 @@ dataset_tests <- function (dataset) {
   
   
   ## Remove these columns also from the dataset for the moment
-  dataset_new_final <- 
+  dataset_new_final0 <- 
     lapply(1:length(col_all_miss), function(x) {if (length(col_all_miss[[x]]) > 0) {
       subset(dataset_new[[x]], select = -col_all_miss[[x]])
     } else {
       dataset_new[[x]]
     }})
+  names(dataset_new_final0) <- names(dataset)
+  
+  
+  ## Keep only datasets with at least four charactersitics after dropping those with too many missing data
+  #' Number of characteristics per dataset (before dropping those with too many missing data)
+  num_chars <- unname(unlist(lapply(dataset_new, function(x) dim(x[, -c(1:3)])[2] - 1)))
+  
+  #' Vector of the number of unique dropped characteristics per dataset
+  dropped_char <- as.numeric(lapply(col_all_miss_names, function(x) if (length(unique(unlist(x))) == 0) {
+    0
+  } else {
+    length(unique(unlist(x)))
+  }))
+  
+  #' Get the dataset(s) with less than 4 characteristics
+  exclude_datasets <- which(num_chars - dropped_char < 4) # 64 102 107 122 168
+  
+  # Get final database after removing datasets with less than four characteristics
+  dataset_new_final <- dataset_new_final0[-exclude_datasets]
+  
+  return(list(dataset_new_final = dataset_new_final,
+              exclude_datasets = exclude_datasets))
 }
 
 

@@ -32,11 +32,15 @@ load("./data/Overall Dissimilarities_Results.RData")
 
 ## Dataset preparation ----
 # Get 'dataset_new'
-dataset_new0 <- get_dataset_new(read_all_excels)
+dataset_new00 <- get_dataset_new(read_all_excels)
 
 # Remove datasets with less than four characteristics (after removing dose-related characteristics)
-remove <- which(unname(unlist(lapply(dataset_new0, function(x) dim(x)[2] - 3))) < 4)
-dataset_new <- dataset_new0[-remove] 
+remove <- which(unname(unlist(lapply(dataset_new00, function(x) dim(x)[2] - 3))) < 4)
+dataset_new0 <- dataset_new00[-remove] 
+
+# Remove networks with less than four characteristics after removing dropped characteristics
+#' (based on the 'comp_clustering' function of rnmamod)
+dataset_new <- dataset_tests(dataset_new0)
 
 # Include proper threshold to each dataset based on their design factors
 database_thresh <- dataset_threshold(dataset_new)[, c(2, 7:8, 11:12)]
