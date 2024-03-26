@@ -107,7 +107,7 @@ dropped_char_list <-
     }) 
   })
 
-#' Vector of the nuber of unique dropped characteristics per dataset
+#' Vector of the number of unique dropped characteristics per dataset
 dropped_char <- as.numeric(lapply(dropped_char_list, function(x) if (length(unique(unlist(x))) == 0) {
   0
 } else {
