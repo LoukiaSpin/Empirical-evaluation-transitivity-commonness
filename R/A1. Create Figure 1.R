@@ -9,9 +9,6 @@
 #*******************************************************************************
 
 
-## Load rnmamod developmental version
-#remotes::install_github("https://github.com/LoukiaSpin/rnmamod.git", force = TRUE)
-
 
 ## Load libraries
 library("rnmamod")
