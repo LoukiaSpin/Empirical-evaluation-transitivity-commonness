@@ -105,8 +105,17 @@ capture_warning <-
 
 
 
+## Datasets with warnings about chi-squared approximation being questionable 
+# Vector with number of such warnings per analysed dataset
+num_warn_chisquared_test <- unname(unlist(lapply(capture_warning, function(x) length(which(!is.na(x))))))
+
+# Number of datasets with such warnings
+length(num_warn_chisquared_test[num_warn_chisquared_test > 0])
+
+
+
 ## % Characteristics with NaN p-value (one-way ANOVA) per network ----
-# Number of characteristics per network 
+# Number of characteristics per network (-1 for to the 'Comparison' column at the end)
 num_chars_initial <- unname(unlist(lapply(dataset_tests_final, function(x) dim(x[, -c(1:3)])[2] - 1)))
 
 # Number of undefined F-tests (one-way ANOVA) per network
@@ -124,14 +133,14 @@ length(num_undefined_ftests_net[num_undefined_ftests_net > 0])
 
 
 ## Investigate the number of analysed characteristics in the 31 'eligible' datasets ----
-# % analysed characteristics per network (-1 for to the 'Comparison' column at the end)
+# % analysed characteristics per network 
 perc_chars_analysed <- (num_chars_initial - num_undefined_ftests_net) / num_chars_initial
 
 # Descriptives
 round(summary(perc_chars_analysed[perc_chars_analysed < 1]) * 100, 1)
 
 # Number of networks with less characteristics than originally
-length(perc_chars_analysed[perc_chars_analysed < 1])
+length(perc_chars_analysed[perc_chars_analysed < 1]) # 21!
 
 
 ## % of statistically significant characteristics per analysed network ----
