@@ -1,8 +1,16 @@
-## Function to obtain 'dataset_new'
+#*******************************************************************************
+#*
+#*
+#*                 Function to obtain 'dataset_new' for analysis                              
+#*                   (Removing dose-related characteristics)                                       
+#*
+#*
+#*******************************************************************************
+
 get_dataset_new <- function (read_all_excels) {
   
   ## Dataset preparation
-  # STEP 00: Remove columns relating to dose characteristics
+  # STEP 0: Remove columns relating to dose characteristics
   dataset_start <- lapply(read_all_excels, 
                           function(x) x[!names(x) %in% names(x[, startsWith(names(x), "treat.dos") | 
                                                                  startsWith(names(x), "treat.type") | 
@@ -13,17 +21,17 @@ get_dataset_new <- function (read_all_excels) {
                                                                  startsWith(names(x), "route1") |
                                                                  startsWith(names(x), "route2")])])
 
-  # STEP 0: Turn into data.frame
+  # STEP 1: Turn into data.frame
   dataset_new00 <- lapply(dataset_start, as.data.frame)
   
-  # STEP 1: Remove columns with treatment names
+  # STEP 2: Remove columns with treatment names
   dataset_new0 <- lapply(dataset_new00, function(x) x[, -c(4,5)])
   
-  # STEP 2: Turn 'character' columns into 'integer'
+  # STEP 3: Turn 'character' columns into 'integer'
   dataset_new <- lapply(dataset_new0, 
                         function(x) {x[sapply(x, class) == 'character'] <- lapply(x[sapply(x, class) == 'character'], as.factor); x})
   
-  # STEP 3: Turn study and treatment columns from 'double' to 'character'
+  # STEP 4: Turn study and treatment columns from 'double' to 'character'
   dataset_new <- lapply(dataset_new, 
                         function(x) {x[1:3] <- lapply(x[1:3], as.character); x})
   
@@ -32,9 +40,21 @@ get_dataset_new <- function (read_all_excels) {
 
 
 
-#' Function to clean dataset from characteristics with missing data that 
-#' are removed from 'comp_clustering' function. The dataset is used to apply
-#' statistical tests for transitivity evaluation
+#*******************************************************************************
+#*
+#*
+#*   Function with following actions: 
+#*   (1) cleans datasets from characteristics with missing data that 
+#*   are removed from 'comp_clustering' function. 
+#*   (2) identify the datasets with less than four characteristics after
+#*   dropping characteristics with too many missing data (see (1))
+#*   (3) returns a 'clean' dataset after applying (1) and (2) to be used in
+#*   R script 'E1. Create Figures 5.R' on statistical tests for 
+#*   transitivity evaluation
+#* 
+#*
+#*******************************************************************************
+
 dataset_tests <- function (dataset) {
   
   
@@ -92,27 +112,34 @@ dataset_tests <- function (dataset) {
 }
 
 
-## Assign proper threshold to each dataset based on their design factors
+
+#*******************************************************************************
+#*
+#*
+#*  Assign proper threshold to each dataset based on their design factors
+#* 
+#*
+#*******************************************************************************
+
 dataset_threshold <- function (dataset_new) {
   
   
   ## Load libraries ----
-  list.of.packages <- c("readxl", "dplyr")
-  lapply(list.of.packages, require, character.only = TRUE); rm(list.of.packages)
+  library("dplyr")
 
   
   ## Load datasets ----
   # TRACE-NMA dataset
-  load("./data/TRACE-NMA Dataset.RData")
+  load("./data/TRACE-NMA Dataset.RData") # all 217 dataset
   
   # Index of included systematic reviews
   load("./data/index_reviews.RData")
 
   
   ## Dataset preparation ----
-  # Get PMIDs from 'dataset_new'
-  pmid_dataset_new <- unlist(lapply(1:length(dataset_new), 
-                                    function(x) substr(names(dataset_new)[x], start = 30, stop = 37)))
+  # Get PMIDs from 'read_all_excels'
+  pmid_dataset_new <- unlist(lapply(1:length(read_all_excels), 
+                                    function(x) substr(names(read_all_excels)[x], start = 30, stop = 37)))
   
   # Perform the sorting
   list_extracted_networks <- index_reviews[match(pmid_dataset_new, index_reviews$PMID), ]
@@ -132,7 +159,7 @@ dataset_threshold <- function (dataset_new) {
   average_size <- c("small", "moderate", "large")
   
   # Define average size per network: Get the mean age per network
-  mean_size_net0 <- suppressWarnings({unname(unlist(lapply(dataset_new, function(x) mean(x$sample.size, na.rm = TRUE))))})
+  mean_size_net0 <- suppressWarnings({unname(unlist(lapply(read_all_excels, function(x) mean(x$sample.size, na.rm = TRUE))))})
   
   #' Define average size per network: For networks without information on the study sample, 
   #' replace NA with the median of 'mean_size_net0'
@@ -170,8 +197,17 @@ dataset_threshold <- function (dataset_new) {
   
 }
 
-## Function to capture warning
-#' Original source: https://stackoverflow.com/questions/4948361/how-do-i-save-warnings-and-errors-as-output-from-a-function
+
+
+#*******************************************************************************
+#*
+#*
+#* Function to capture warning (Applied in R script 'E1. Create Figures 5.R')
+#* Original source: https://stackoverflow.com/questions/4948361/how-do-i-save-warnings-and-errors-as-output-from-a-function
+#* 
+#*
+#*******************************************************************************
+
 myTryCatch <- function(expr) {
   warn <- err <- NA
   value <- withCallingHandlers(
