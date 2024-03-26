@@ -40,10 +40,14 @@ dataset_new0 <- dataset_new00[-remove]
 
 # Remove networks with less than four characteristics after removing dropped characteristics
 #' (based on the 'comp_clustering' function of rnmamod)
-dataset_new <- dataset_tests(dataset_new0)
+excluded_datasets <- dataset_tests(dataset_new0)$exclude_datasets
+dataset_new <- dataset_new0[-excluded_datasets]
 
 # Include proper threshold to each dataset based on their design factors
 database_thresh <- dataset_threshold(dataset_new)[, c(2, 7:8, 11:12)]
+
+# Reduce the list of 'comp_clustering' results to those from the analysed 209 datasets
+dissimilarities <- dissimilarities[-excluded_datasets]
 
 
 
@@ -208,7 +212,7 @@ num_intrans_net_50 <-
   count(decision)
 
 # Number of intransitive network with '50% threshold' (ALL!!)
-length(table(intransit_comp_50$network_id))  # 214
+length(table(intransit_comp_50$network_id))  # 209
 
 # 75% threshold: % *networks* with 'transitivity' and 'probably intransitivity' 
 intransit_comp_75 <-

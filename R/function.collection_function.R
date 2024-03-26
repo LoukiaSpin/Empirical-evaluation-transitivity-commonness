@@ -103,23 +103,20 @@ dataset_threshold <- function (dataset_new) {
   
   ## Load datasets ----
   # TRACE-NMA dataset
-  load("./41_R Dataset creation/TRACE-NMA Dataset.RData")
+  load("./data/TRACE-NMA Dataset.RData")
   
-  # Extracted networks (one network per row)
-  list_extracted_networks00 <- as.data.frame(read_excel("./30_Extracted networks/eligible_networks_REDcap_dataset.xlsx", sheet = 1))
-  
-  # Remove network (PMID: 24166910) with only single-study comparisons
-  list_extracted_networks0 <- subset(list_extracted_networks00, Extractable == "Yes")[, c("PMID", "Outcome.Type", "Intervention.Comparison.Type")] #  & PMID != 24166910
+  # Index of included systematic reviews
+  load("./data/index_reviews.RData")
+
   
   ## Dataset preparation ----
-  
   # Get PMIDs from 'dataset_new'
   pmid_dataset_new <- unlist(lapply(1:length(dataset_new), 
                                     function(x) substr(names(dataset_new)[x], start = 30, stop = 37)))
   
   # Perform the sorting
-  list_extracted_networks <- list_extracted_networks0[match(pmid_dataset_new, list_extracted_networks0$PMID), ]
-  colnames(list_extracted_networks)[2:3] <- c("outcome_type", "interv_comp_type")
+  list_extracted_networks <- index_reviews[match(pmid_dataset_new, index_reviews$PMID), ]
+  colnames(list_extracted_networks)[7:8] <- c("outcome_type", "interv_comp_type")
   list_extracted_networks$interv_comp_type <- 
     factor(plyr::revalue(list_extracted_networks$interv_comp_type,
                          c("non-pharmacological vs any" = "Non-pharma vs. Any",
@@ -162,10 +159,10 @@ dataset_threshold <- function (dataset_new) {
       0.56, 0.35, 0.58, 0.01, 0.006, 0.01, 0.30, 0.18, 0.33)
   
   # Match network design factors with threshold and add 'threshold' column in 'list_extracted_networks'
-  list_extracted_networks$threshold_50 <- inner_join(data.frame(list_extracted_networks[, 2:3], 
+  list_extracted_networks$threshold_50 <- inner_join(data.frame(list_extracted_networks[, 7:8], 
                                                                 average_size = size_net_label), 
                                                      threshold_set[, -5])[, 4]
-  list_extracted_networks$threshold_75 <- inner_join(data.frame(list_extracted_networks[, 2:3], 
+  list_extracted_networks$threshold_75 <- inner_join(data.frame(list_extracted_networks[, 7:8], 
                                                                 average_size = size_net_label), 
                                                      threshold_set[, -4])[, 4]
   
