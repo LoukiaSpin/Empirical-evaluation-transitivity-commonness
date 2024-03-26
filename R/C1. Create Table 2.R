@@ -68,7 +68,7 @@ summary(num_chars)
 num_numer_chars <- sapply(dataset_new, function(x) length(which(lapply(x, typeof) == "double")))
 perc_numer_chars <- round((num_numer_chars / num_chars) * 100, 0)
 summary(perc_numer_chars)
-length(which(perc_numer_chars == 100)) # 26 networks contained only numeric characteristics
+length(which(perc_numer_chars == 100)) # 27 networks contained only numeric characteristics
 length(which(perc_numer_chars == 0))   # 1 network did not contain any numeric characteristics
 
 # Percentage of non-numeric characteristics
@@ -76,7 +76,7 @@ num_nonnumer_chars <- sapply(dataset_new, function(x) length(which(lapply(x, typ
 perc_nonnumer_chars <- round((num_nonnumer_chars / num_chars) * 100, 0)
 summary(perc_nonnumer_chars)
 length(which(perc_nonnumer_chars == 100)) # 1 network contained only non-numeric characteristics
-length(which(perc_nonnumer_chars == 0))   # 26 networks did not contain any non-numeric characteristics
+length(which(perc_nonnumer_chars == 0))   # 27 networks did not contain any non-numeric characteristics
 
 # Percentage of total missing data
 perc_miss_total <- 
@@ -86,13 +86,13 @@ summary(perc_miss_total[perc_miss_total > 0]) # Excluding datasets without missi
 length(dataset_new) - length(which(perc_miss_total == 0)) # 177 networks with at least one missing case
 
 # Percentage of missing data per characteristic
-num_miss_char <- sapply(dataset_new, function(x) colSums(is.na(x[, -c(1, 3)]))) 
+num_miss_char <- sapply(dataset_new, function(x) colSums(is.na(x[, -c(1:3)]))) 
 perc_miss_char <- 
   unname(unlist(sapply(dataset_new, function(x) round((colSums(is.na(x[, -c(1:3)])) / dim(x)[1]) * 100, 1))))
 summary(perc_miss_char[perc_miss_char > 0])
 
 # Percentage of characteristics with at least one missing case
-num_char_miss <- sapply(dataset_new, function(x) length(names(which(colSums(is.na(x[, -c(1, 3)])) > 0))))
+num_char_miss <- sapply(dataset_new, function(x) length(names(which(colSums(is.na(x[, -c(1:3)])) > 0))))
 perc_char_miss <- round((as.numeric(unlist(num_char_miss)) / as.numeric(unlist(num_chars))) * 100, 1)
 summary(perc_char_miss[perc_char_miss > 0])
 length(which(perc_char_miss > 0))  # 177 networks with at least one missing case
@@ -117,4 +117,4 @@ dropped_char <- as.numeric(lapply(dropped_char_list, function(x) if (length(uniq
 #' Get the descriptive statistics
 perc_dropped_char <- round((dropped_char / num_chars) * 100, 0)
 summary(dropped_char[dropped_char > 0])
-length(dropped_char[dropped_char > 0]) # 125 networks with at least one dropped characteristic
+length(dropped_char[dropped_char > 0]) # 124 networks with at least one dropped characteristic
