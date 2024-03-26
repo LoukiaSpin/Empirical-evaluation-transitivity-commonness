@@ -38,7 +38,7 @@ dataset_new00 <- get_dataset_new(read_all_excels)
 remove <- which(unname(unlist(lapply(dataset_new00, function(x) dim(x)[2] - 3))) < 4)
 dataset_new0 <- dataset_new00[-remove] 
 
-# Remove networks with less than four characteristics after removing dropped characteristics
+# Remove also datasets with less than four characteristics after removing dropped characteristics
 #' (based on the 'comp_clustering' function of rnmamod)
 excluded_datasets <- dataset_tests(dataset_new0)$exclude_datasets
 dataset_new <- dataset_new0[-excluded_datasets]
