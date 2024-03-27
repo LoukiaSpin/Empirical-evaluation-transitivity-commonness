@@ -35,7 +35,8 @@ load("./data/Overall Dissimilarities_Results.RData")
 dataset_new00 <- get_dataset_new(read_all_excels)
 
 # Remove datasets with less than four characteristics (after removing dose-related characteristics)
-remove <- which(unname(unlist(lapply(dataset_new00, function(x) dim(x)[2] - 3))) < 4)
+remove <- which(unname(unlist(lapply(dataset_new00, 
+                                     function(x) dim(subset(x, select = -c(trial, treat1, treat2)))[2]))) < 4)
 dataset_new0 <- dataset_new00[-remove] 
 
 # Remove also datasets with less than four characteristics after removing dropped characteristics
@@ -143,16 +144,17 @@ round(summary(perc_chars_analysed[perc_chars_analysed < 1]) * 100, 1)
 length(perc_chars_analysed[perc_chars_analysed < 1]) # 21!
 
 
-## % of statistically significant characteristics per analysed network ----
-# % of statistically significant tests per network 
-stat_sign_char_net <- unname(unlist(lapply(test_type_results, function(x) length(which(x[, 1] < 0.05)) / dim(x)[1])))
 
-# Summarise across networks
-summary(stat_sign_char_net[stat_sign_char_net > 0]) * 100 # range: 4.17% to 50%
+## Datasets with at least one statistically significant test may be intransitive ----
+# % of statistically significant tests per dataset 
+stat_sign_char_net <- unname(unlist(lapply(test_type_results, function(x) length(which(na.omit(unlist(x[,1])) < 0.05)) / length(na.omit(unlist(x[,1]))))))
+
+# Indicate for which datasets the tests were conclusive (intransitivity) or inconclusive
+test_trans_result <- ifelse(stat_sign_char_net > 0, "inconclusive", "conclusive")
 
 # Number of networks with conclusive results
 #' At least one characteristic was associated with p-value < 5%
-num_net_conclusive <- length(stat_sign_char_net[stat_sign_char_net > 0])   # 19 networks (out of 31) - The remaining 12 had *only* inconclusive results!
+length(which(test_trans_result == "conclusive"))  # 12 networks (out of 31) - The remaining 19 had *only* inconclusive results!
 
 
 
@@ -187,33 +189,33 @@ extent_diss_restr_75 <-
   lapply(1:length(diss_dataset_restr_fin), 
          function(x) ifelse(diss_dataset_restr_fin[[x]] < dataset_threshold_restr$threshold_75[x], "low", "likely concerning"))
 
-# Include the p-valuzes from statistical testing, repeating them by the size of elements of 'diss_dataset_restr_fin'
-sign_concl_per_net <- lapply(1:length(stat_sign_char_net), 
-                             function(x) rep(stat_sign_char_net[x], length(diss_dataset_restr_fin[[x]])))
+# Include the result ("conclusive"/"inconclusive") from statistical testing, repeating it by the size of elements of 'diss_dataset_restr_fin'
+sign_concl_per_net <- lapply(1:length(test_trans_result), 
+                             function(x) rep(test_trans_result[x], length(diss_dataset_restr_fin[[x]])))
 
-# Bring together
+# Bring together 
 trans_concl_thresh <- Map(cbind, sign_concl_per_net, diss_dataset_restr_fin, extent_diss_restr_50, extent_diss_restr_75)
-lapply(trans_concl_thresh, function(x) {colnames(x) <- c("Prec_sign_tests", "D_B", "median", "third quartile"); x})
+lapply(trans_concl_thresh, function(x) {colnames(x) <- c("Test_conclusion", "D_B", "median", "third quartile"); x})
 
 # Number of network with transitivity conclusions based on 'second quartile'
 sign_low_sec <- 
-  length(Filter(function(x) all(as.numeric(x[, 1]) > 0 & x[, 3] == "low"), trans_concl_thresh)) 
+  length(Filter(function(x) all(x[, 1] == "conclusive" & x[, 3] == "low"), trans_concl_thresh)) 
 nonsign_low_sec <- 
-  length(Filter(function(x) all(as.numeric(x[, 1]) == 0 & x[, 3] == "low"), trans_concl_thresh))
+  length(Filter(function(x) all(x[, 1] == "inconclusive" & x[, 3] == "low"), trans_concl_thresh))
 sign_high_sec <- 
-  length(Filter(function(x) any(as.numeric(x[, 1]) > 0 & x[, 3] == "likely concerning"), trans_concl_thresh))
+  length(Filter(function(x) any(x[, 1] == "conclusive" & x[, 3] == "likely concerning"), trans_concl_thresh))
 nonsign_high_sec <- 
-  length(Filter(function(x) any(as.numeric(x[, 1]) == 0 & x[, 3] == "likely concerning"), trans_concl_thresh))
+  length(Filter(function(x) any(x[, 1] == "inconclusive" & x[, 3] == "likely concerning"), trans_concl_thresh))
 
 # Number of network with transitivity conclusions based on 'third quartile'
 sign_low_third <-
-  length(Filter(function(x) all(as.numeric(x[, 1]) > 0 & x[, 4] == "low"), trans_concl_thresh))
+  length(Filter(function(x) all(x[, 1] == "conclusive" & x[, 4] == "low"), trans_concl_thresh))
 nonsign_low_third <- 
-  length(Filter(function(x) all(as.numeric(x[, 1]) == 0 & x[, 4] == "low"), trans_concl_thresh))
+  length(Filter(function(x) all(x[, 1] == "inconclusive" & x[, 4] == "low"), trans_concl_thresh))
 sign_high_third <- 
-  length(Filter(function(x) any(as.numeric(x[, 1]) > 0 & x[, 4] == "likely concerning"), trans_concl_thresh))
+  length(Filter(function(x) any(x[, 1] == "conclusive" & x[, 4] == "likely concerning"), trans_concl_thresh))
 nonsign_high_third <- 
-  length(Filter(function(x) any(as.numeric(x[, 1]) == 0 & x[, 4] == "likely concerning"), trans_concl_thresh))
+  length(Filter(function(x) any(x[, 1] == "inconclusive" & x[, 4] == "likely concerning"), trans_concl_thresh))
 
 
 

@@ -35,7 +35,8 @@ load("./data/Overall Dissimilarities_Results.RData")
 dataset_new00 <- get_dataset_new(read_all_excels)
 
 # Remove datasets with less than four characteristics (after removing dose-related characteristics)
-remove <- which(unname(unlist(lapply(dataset_new00, function(x) dim(x)[2] - 3))) < 4)
+remove <- which(unname(unlist(lapply(dataset_new00, 
+                                     function(x) dim(subset(x, select = -c(trial, treat1, treat2)))[2]))) < 4)
 dataset_new0 <- dataset_new00[-remove] 
 
 # Remove also datasets with less than four characteristics after removing dropped characteristics
@@ -44,7 +45,7 @@ excluded_datasets <- dataset_tests(dataset_new0)$exclude_datasets
 dataset_new <- dataset_new0[-excluded_datasets] 
 
 # Include proper threshold to each dataset based on their design factors
-database_thresh <- dataset_threshold(dataset_new)[, c(2, 7:8, 11:12)]
+database_thresh <- dataset_threshold(dataset_new)[, c("PMID", "outcome_type", "interv_comp_type", "threshold_50", "threshold_75")]
 
 # Reduce the list of 'comp_clustering' results to those from the analysed 209 datasets
 dissimilarities <- dissimilarities[-excluded_datasets]
@@ -192,4 +193,3 @@ ggplot(thres_between_plot,
         legend.margin = margin(0, 0, 0, 0),
         strip.text = element_text(size = 14, face = "bold"))
 dev.off()
-
