@@ -32,20 +32,22 @@ load("./data/TRACE-NMA Dataset.RData")
 dataset_new0 <- get_dataset_new(read_all_excels)
 
 # Remove datasets with less than four characteristics (after removing dose-related characteristics)
-remove <- which(unname(unlist(lapply(dataset_new0, function(x) dim(x)[2] - 3))) < 4)
+remove <- which(unname(unlist(lapply(dataset_new0, function(x) dim(subset(x, select = -c(trial, treat1, treat2)))[2]))) < 4)
 dataset_new <- dataset_new0[-remove] 
 
-# Drop further datasets with less than four characteristics (after dropping characteristics with too many missng data)
-dataset_new_red <- dataset_tests(dataset_new)$dataset_new_final
+# Drop further datasets with less than four characteristics (after dropping characteristics with too many missing data)
+dataset_new_red <- lapply(dataset_tests(dataset_new)$dataset_new_final, function(x) subset(x, select = -Comparison))
 
 
 
 ## Obtain the number of characteristics per dataset ----
 # Original database (214 datasets)
-num_chars <- unname(unlist(lapply(dataset_new, function(x) dim(x[, -c(1:3)])[2])))
+num_chars <- unname(unlist(lapply(dataset_new, 
+                                  function(x) dim(subset(x, select = -c(trial, treat1, treat2)))[2])))
 
 # Reduced database (209 datasets)
-num_chars_red <- unname(unlist(lapply(dataset_new_red, function(x) dim(x[, -c(1:3)])[2] - 1)))
+num_chars_red <- unname(unlist(lapply(dataset_new_red, 
+                                      function(x) dim(subset(x, select = -c(trial, treat1, treat2)))[2])))
 
 
 
@@ -64,13 +66,6 @@ all_chars <-
                     outline_bars = TRUE, 
                     .width = c(0.50, 0.95),  # IQR and 95% interval
                     alpha = 0.5) +
-  #stat_slab(colour = "gray70",
-  #          fill = NA) +
-  #stat_dots(aes(x = num_chars, 
-  #              y = 0.004),
-  #          position = "dodgejust",
-  #          dotsize = 0.5,
-  #          alpha = 0.7) +
   scale_x_continuous(breaks = seq(4, 41, 3), limits = c(4, 41)) + 
   labs(y = " ",
        x = "") +
@@ -81,7 +76,7 @@ all_chars <-
         axis.title = element_text(size = 14, face = "bold"),
         strip.text = element_text(size = 14, face = "bold"))
 
-#' After removing characteristics and datasets with less than 4 characteristics
+#' After removing 'dropped' characteristics and datasets with less than 4 characteristics
 reduced_chars <-
   ggplot(data.frame(num_chars_red),
          aes(x = num_chars_red, 
@@ -95,13 +90,6 @@ reduced_chars <-
                     outline_bars = TRUE, 
                     .width = c(0.50, 0.95),  # IQR and 95% interval
                     alpha = 0.5) +
-  #stat_slab(colour = "gray70",
-  #          fill = NA) +
-  #stat_dots(aes(x = num_chars_fin, 
-  #              y = 0.004),
-  #          position = "dodgejust",
-  #          dotsize = 0.5,
-  #          alpha = 0.7) +
   scale_x_continuous(breaks = seq(4, 41, 3), limits = c(4, 41)) + 
   labs(y = " ",
        x = "Number of extracted characteristics") +

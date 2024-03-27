@@ -32,11 +32,12 @@ load("./data/TRACE-NMA Dataset.RData")
 dataset_new0 <- get_dataset_new(read_all_excels)
 
 # Remove datasets with less than four characteristics (after removing dose-related characteristics)
-remove <- which(unname(unlist(lapply(dataset_new0, function(x) dim(x)[2] - 3))) < 4)
+remove <- which(unname(unlist(lapply(dataset_new0, 
+                                     function(x) dim(subset(x, select = -c(trial, treat1, treat2)))[2]))) < 4)
 dataset_new <- dataset_new0[-remove] 
 
 # Include proper threshold to each dataset based on their design factors
-database_thresh <- dataset_threshold(dataset_new)[, c(2, 7:8)]
+database_thresh <- dataset_threshold(dataset_new)[, c("PMID", "outcome_type", "interv_comp_type")]
 
 
 

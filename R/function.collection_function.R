@@ -129,17 +129,14 @@ dataset_threshold <- function (dataset_new) {
 
   
   ## Load datasets ----
-  # TRACE-NMA dataset
-  load("./data/TRACE-NMA Dataset.RData") # all 217 dataset
-  
   # Index of included systematic reviews
   load("./data/index_reviews.RData")
 
   
   ## Dataset preparation ----
-  # Get PMIDs from 'read_all_excels'
-  pmid_dataset_new <- unlist(lapply(1:length(read_all_excels), 
-                                    function(x) substr(names(read_all_excels)[x], start = 30, stop = 37)))
+  # Get PMIDs from 'dataset_new'
+  pmid_dataset_new <- unlist(lapply(1:length(dataset_new), 
+                                    function(x) substr(names(dataset_new)[x], start = 30, stop = 37)))
   
   # Perform the sorting
   list_extracted_networks <- index_reviews[match(pmid_dataset_new, index_reviews$PMID), ]
@@ -159,7 +156,7 @@ dataset_threshold <- function (dataset_new) {
   average_size <- c("small", "moderate", "large")
   
   # Define average size per network: Get the mean age per network
-  mean_size_net0 <- suppressWarnings({unname(unlist(lapply(read_all_excels, function(x) mean(x$sample.size, na.rm = TRUE))))})
+  mean_size_net0 <- suppressWarnings({unname(unlist(lapply(dataset_new, function(x) mean(x$sample.size, na.rm = TRUE))))})
   
   #' Define average size per network: For networks without information on the study sample, 
   #' replace NA with the median of 'mean_size_net0'
