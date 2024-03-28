@@ -137,7 +137,7 @@ length(num_undefined_ftests_net[num_undefined_ftests_net > 0])
 # % analysed characteristics per network 
 perc_chars_analysed <- (num_chars_initial - num_undefined_ftests_net) / num_chars_initial
 
-# Descriptives
+# Descriptives for those networks that 'lost' at least one characteristic
 round(summary(perc_chars_analysed[perc_chars_analysed < 1]) * 100, 1)
 
 # Number of networks with less characteristics than originally
@@ -150,11 +150,13 @@ length(perc_chars_analysed[perc_chars_analysed < 1]) # 21!
 stat_sign_char_net <- unname(unlist(lapply(test_type_results, function(x) length(which(na.omit(unlist(x[,1])) < 0.05)) / length(na.omit(unlist(x[,1]))))))
 
 # Indicate for which datasets the tests were conclusive (intransitivity) or inconclusive
-test_trans_result <- ifelse(stat_sign_char_net > 0, "inconclusive", "conclusive")
+test_trans_result <- ifelse(stat_sign_char_net > 0, "conclusive", "inconclusive")
+#' If, in a dataset, there was at least one characteristic with p-value < 0.05, stat_sign_char_net > 0 (conclusive evidence).
+#' If in a dataset, there was no characteristic with p-value < 0.05, stat_sign_char_net == 0 (INconclusive evidence).
 
 # Number of networks with conclusive results
 #' At least one characteristic was associated with p-value < 5%
-length(which(test_trans_result == "conclusive"))  # 12 networks (out of 31) - The remaining 19 had *only* inconclusive results!
+length(which(test_trans_result == "conclusive"))  # 19 networks (out of 31) - The remaining 12 had *only* inconclusive results!
 
 
 
