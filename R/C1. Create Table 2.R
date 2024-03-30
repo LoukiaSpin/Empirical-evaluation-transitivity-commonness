@@ -10,14 +10,22 @@
 
 
 
+## Load libraries
+library("tracenma")
+
+
+
 ## Load functions ----
 source("./R/function.collection_function.R")
 
 
 
-## Load datasets ----
-# TRACE-NMA dataset
-load("./data/TRACE-NMA Dataset.RData")
+## Load tracenma dataset ----
+# Obtain the PMID number of the datasets
+pmid_index <- index$PMID
+
+# Load all 217 datasets as data-frames
+read_all_excels <- lapply(pmid_index, function(x) get.dataset(pmid = x)$Dataset)
 
 
 
@@ -29,7 +37,6 @@ dataset_new0 <- get_dataset_new(read_all_excels)
 remove <- which(unname(unlist(lapply(dataset_new0, 
                                      function(x) dim(subset(x, select = -c(trial, treat1, treat2)))[2]))) < 4)
 dataset_new <- dataset_new0[-remove] 
-
 
 
 

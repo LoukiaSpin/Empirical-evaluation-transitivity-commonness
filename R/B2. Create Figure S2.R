@@ -11,7 +11,7 @@
 
 
 ## Load libraries ----
-list.of.packages <- c("dplyr", "ggplot2", "gghalves", "ggdist", "ggpubr")
+list.of.packages <- c("tracenma", "dplyr", "ggplot2", "ggdist", "ggpubr")
 lapply(list.of.packages, require, character.only = TRUE); rm(list.of.packages)
 
 
@@ -21,9 +21,12 @@ source("./R/function.collection_function.R")
 
 
 
-## Load datasets ----
-# TRACE-NMA dataset
-load("./data/TRACE-NMA Dataset.RData")
+## Load tracenma dataset ----
+# Obtain the PMID number of the datasets
+pmid_index <- index$PMID
+
+# Load all 217 datasets as data-frames
+read_all_excels <- lapply(pmid_index, function(x) get.dataset(pmid = x)$Dataset)
 
 
 

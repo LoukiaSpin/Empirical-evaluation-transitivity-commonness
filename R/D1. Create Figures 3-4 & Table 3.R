@@ -11,7 +11,7 @@
 
 
 ## Load libraries ----
-list.of.packages <- c("dplyr", "ggplot2", "gghalves", "ggdist")
+list.of.packages <- c("tracenma", "dplyr", "ggplot2")
 lapply(list.of.packages, require, character.only = TRUE); rm(list.of.packages)
 
 
@@ -22,8 +22,11 @@ source("./R/function.collection_function.R")
 
 
 ## Load datasets ----
-# TRACE-NMA dataset
-load("./data/TRACE-NMA Dataset.RData")
+# Obtain the PMID number of the datasets (tracenma)
+pmid_index <- index$PMID
+
+# Load all 217 datasets as data-frames (tracenma)
+read_all_excels <- lapply(pmid_index, function(x) get.dataset(pmid = x)$Dataset)
 
 # Overall dissimilarity results 
 load("./data/Overall Dissimilarities_Results.RData")
@@ -39,14 +42,17 @@ remove <- which(unname(unlist(lapply(dataset_new00,
                                      function(x) dim(subset(x, select = -c(trial, treat1, treat2)))[2]))) < 4)
 dataset_new0 <- dataset_new00[-remove] 
 
+# Remove indices referring to datasets with less than four characteristics (after removing dose-related characteristics)
+index_new0 <- index[-remove, ]
 
 # Remove also datasets with less than four characteristics after removing dropped characteristics
 #' (based on the 'comp_clustering' function of rnmamod)
 excluded_datasets <- dataset_tests(dataset_new0)$exclude_datasets
 dataset_new <- dataset_new0[-excluded_datasets]
+index_new <- index_new0[-excluded_datasets, ]
 
 # Include proper threshold to each dataset based on their design factors
-database_thresh <- dataset_threshold(dataset_new)[, c("PMID", "outcome_type", "interv_comp_type", "threshold_50", "threshold_75")]
+database_thresh <- dataset_threshold(dataset_new, index_new)[, c("PMID", "outcome_type", "interv_comp_type", "threshold_50", "threshold_75")]
 
 # Reduce the list of 'comp_clustering' results to those from the analysed 209 datasets
 dissimilarities <- dissimilarities[-excluded_datasets]

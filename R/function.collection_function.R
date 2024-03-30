@@ -121,32 +121,27 @@ dataset_tests <- function (dataset) {
 #*
 #*******************************************************************************
 
-dataset_threshold <- function (dataset_new) {
+dataset_threshold <- function (dataset_new, index) {
   
   
   ## Load libraries ----
-  library("dplyr")
-
-  
-  ## Load datasets ----
-  # Index of included systematic reviews
-  load("./data/index_reviews.RData")
+  library("dplyr"); library("tracenma")
 
   
   ## Dataset preparation ----
-  # Get PMIDs from 'dataset_new'
-  pmid_dataset_new <- unlist(lapply(1:length(dataset_new), 
-                                    function(x) substr(names(dataset_new)[x], start = 30, stop = 37)))
-  
-  # Perform the sorting
-  list_extracted_networks <- index_reviews[match(pmid_dataset_new, index_reviews$PMID), ]
+  # List of extracted networks
+  list_extracted_networks <- index 
   colnames(list_extracted_networks)[7:8] <- c("outcome_type", "interv_comp_type")
+  
+  # Rename the 'interv_comp_type' levels
   list_extracted_networks$interv_comp_type <- 
     factor(plyr::revalue(list_extracted_networks$interv_comp_type,
                          c("non-pharmacological vs any" = "Non-pharma vs. Any",
                            "pharmacological vs pharmacological" = "Pharma vs. Pharma",
                            "pharmacological vs placebo" = "Pharma vs. Placebo")),
            levels = c("Pharma vs. Placebo", "Pharma vs. Pharma", "Non-pharma vs. Any"))
+  
+  # Rename the 'outcome_type' levels
   list_extracted_networks$outcome_type <- factor(list_extracted_networks$outcome_type,
                                                  levels = c("Objective", "Semi-objective", "Subjective"))
   

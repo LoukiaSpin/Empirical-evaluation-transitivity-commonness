@@ -11,7 +11,7 @@
 
 
 ## Load libraries ----
-list.of.packages <- c("reshape2", "ggplot2")
+list.of.packages <- c("tracenma", "reshape2", "ggplot2")
 lapply(list.of.packages, require, character.only = TRUE); rm(list.of.packages)
 
 
@@ -21,9 +21,12 @@ source("./R/function.collection_function.R")
 
 
 
-## Load datasets ----
-# TRACE-NMA dataset
-load("./data/TRACE-NMA Dataset.RData")
+## Load tracenma dataset ----
+# Obtain the PMID number of the datasets
+pmid_index <- index$PMID
+
+# Load all 217 datasets as data-frames
+read_all_excels <- lapply(pmid_index, function(x) get.dataset(pmid = x)$Dataset)
 
 
 
@@ -36,8 +39,11 @@ remove <- which(unname(unlist(lapply(dataset_new0,
                                      function(x) dim(subset(x, select = -c(trial, treat1, treat2)))[2]))) < 4)
 dataset_new <- dataset_new0[-remove] 
 
+# Remove indices referring to datasets with less than four characteristics (after removing dose-related characteristics)
+index_new <- index[-remove, ]
+
 # Include proper threshold to each dataset based on their design factors
-database_thresh <- dataset_threshold(dataset_new)[, c("PMID", "outcome_type", "interv_comp_type")]
+database_thresh <- dataset_threshold(dataset_new, index_new)[, c("PMID", "outcome_type", "interv_comp_type")]
 
 
 
