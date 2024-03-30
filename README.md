@@ -3,7 +3,7 @@
 ## Description of the repository
 
 The repository offers the typical structure of separate folders for data, and R (scripts to replicate the main and supplementary Tables and Figures).
-* The _data_ folder includes one .RData file: _Overall Dissimilarities_Results_, which is a list of results from 217 datasets (found in [tracenma](https://CRAN.R-project.org/package=tracenma) database) using our proposed approach to transitivity evaluation via the [rnmamod](https://CRAN.R-project.org/package=rnmamod) R package. 
+* The _data_ folder includes one .RData file: _Overall Dissimilarities_Results_, which is a list of results from 214 datasets (found in [tracenma](https://CRAN.R-project.org/package=tracenma) database) using our proposed approach to transitivity evaluation via the [rnmamod](https://CRAN.R-project.org/package=rnmamod) R package. 
 * The _R_ folder includes a script with a collection of necessary self-written functions (function.collection_function.R) to facilitate dataset management and 11 scripts to replicate the main and supplementary Figures and Tables. 
   * _obtain dissimilarities via rnmamod.R_ script calls the [tracenma](https://CRAN.R-project.org/package=tracenma) R package to get the database and applies the proposed approach to transitivity evaluation using the _comp_clustering_ function of the [rnmamod](https://CRAN.R-project.org/package=rnmamod) R package.
   * _function.collection_function.R_ includes functions to (i) capture and remove the
