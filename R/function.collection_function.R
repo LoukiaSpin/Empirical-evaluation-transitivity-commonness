@@ -4,7 +4,8 @@
 #*                 Function to obtain 'dataset_new' for analysis                              
 #*                   (Removing dose-related characteristics)                                       
 #*
-#*
+#* Author: Loukia M. Spineli 
+#* Date: March 2024
 #*******************************************************************************
 
 get_dataset_new <- function (read_all_excels) {
@@ -52,7 +53,8 @@ get_dataset_new <- function (read_all_excels) {
 #*   R script 'E1. Create Figures 5.R' on statistical tests for 
 #*   transitivity evaluation
 #* 
-#*
+#* Author: Loukia M. Spineli 
+#* Date: March 2024
 #*******************************************************************************
 
 dataset_tests <- function (dataset) {
@@ -118,7 +120,8 @@ dataset_tests <- function (dataset) {
 #*
 #*  Assign proper threshold to each dataset based on their design factors
 #* 
-#*
+#* Author: Loukia M. Spineli 
+#* Date: March 2024
 #*******************************************************************************
 
 dataset_threshold <- function (dataset_new, index) {
@@ -197,7 +200,8 @@ dataset_threshold <- function (dataset_new, index) {
 #*  Name each dataset using their ID, Year, PMID, and first Author
 #*  (Applied in R script 'E1. Create Figures 5.R')
 #* 
-#*
+#* Author: Loukia M. Spineli 
+#* Date: March 2024
 #*******************************************************************************
 
 name_each_dataset <- function (read_all_excels, index) {
@@ -229,7 +233,8 @@ name_each_dataset <- function (read_all_excels, index) {
 #* Function to capture warning (Applied in R script 'E1. Create Figures 5.R')
 #* Original source: https://stackoverflow.com/questions/4948361/how-do-i-save-warnings-and-errors-as-output-from-a-function
 #* 
-#*
+#* Author: Loukia M. Spineli 
+#* Date: March 2024
 #*******************************************************************************
 
 myTryCatch <- function(expr) {
