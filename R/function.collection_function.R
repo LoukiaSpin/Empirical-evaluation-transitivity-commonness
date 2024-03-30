@@ -194,6 +194,38 @@ dataset_threshold <- function (dataset_new, index) {
 #*******************************************************************************
 #*
 #*
+#*  Name each dataset using their ID, Year, PMID, and first Author
+#*  (Applied in R script 'E1. Create Figures 5.R')
+#* 
+#*
+#*******************************************************************************
+
+name_each_dataset <- function (read_all_excels, index) {
+  
+  # Extract the year for each dataset
+  year <- lapply(index$Year, function(x) paste("Year:", x))
+  
+  # Extract the PMID for each dataset
+  pmid <- lapply(index$PMID, function(x) paste("PMID:", x))
+  
+  # Extract the first author for each dataset
+  first_author <- lapply(index$First.Author, function(x) paste("Authors:", x, "et al."))
+  
+  # Add ID
+  id <- paste0("ID: [", stringr::str_pad(1:length(year), 3, pad = "0"), "]")
+  
+  # Bring into a data-frame
+  names_list_elements <- data.frame(id, unlist(year), unlist(pmid), unlist(first_author))
+  colnames(names_list_elements) <- c("id", "year", "pmid", "first_author")
+  
+  return(names_list_elements)
+}
+
+
+
+#*******************************************************************************
+#*
+#*
 #* Function to capture warning (Applied in R script 'E1. Create Figures 5.R')
 #* Original source: https://stackoverflow.com/questions/4948361/how-do-i-save-warnings-and-errors-as-output-from-a-function
 #* 

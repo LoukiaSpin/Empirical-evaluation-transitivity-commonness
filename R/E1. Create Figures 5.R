@@ -11,7 +11,7 @@
 
 
 ## Load libraries ----
-list.of.packages <- c("readxl", "plyr", "dplyr", "ggplot2", "ggpubr")
+list.of.packages <- c("tracenma", "plyr", "dplyr", "ggplot2", "ggpubr")
 lapply(list.of.packages, require, character.only = TRUE); rm(list.of.packages)
 
 
@@ -22,8 +22,11 @@ source("./R/function.collection_function.R")
 
 
 ## Load datasets ----
-# TRACE-NMA dataset
-load("./data/TRACE-NMA Dataset.RData")
+# Obtain the PMID number of the datasets (tracenma)
+pmid_index <- index$PMID
+
+# Load all 217 datasets as data-frames (tracenma)
+read_all_excels <- lapply(pmid_index, function(x) get.dataset(pmid = x)$Dataset)
 
 # Overall dissimilarity results 
 load("./data/Overall Dissimilarities_Results.RData")
@@ -34,15 +37,23 @@ load("./data/Overall Dissimilarities_Results.RData")
 # Get 'dataset_new'
 dataset_new00 <- get_dataset_new(read_all_excels)
 
+# Name each dataset (list element)
+names(dataset_new00) <- 
+  apply(name_each_dataset(dataset_new00, index), 1, function(x) paste(x, collapse = ", "))
+
 # Remove datasets with less than four characteristics (after removing dose-related characteristics)
 remove <- which(unname(unlist(lapply(dataset_new00, 
                                      function(x) dim(subset(x, select = -c(trial, treat1, treat2)))[2]))) < 4)
 dataset_new0 <- dataset_new00[-remove] 
 
+# Remove indices referring to datasets with less than four characteristics (after removing dose-related characteristics)
+index_new0 <- index[-remove, ]
+
 # Remove also datasets with less than four characteristics after removing dropped characteristics
 #' (based on the 'comp_clustering' function of rnmamod)
 excluded_datasets <- dataset_tests(dataset_new0)$exclude_datasets
 dataset_new <- dataset_new0[-excluded_datasets] 
+index_new <- index_new0[-excluded_datasets, ]
 
 # Reduce the list of 'comp_clustering' results to those from the analysed 209 datasets
 dissimilarities <- dissimilarities[-excluded_datasets]
@@ -162,8 +173,7 @@ length(which(test_trans_result == "conclusive"))  # 19 networks (out of 31) - Th
 
 ## Restrict both dataset to common PMIDs ----
 # Get PMIDs from 'dataset_new'
-pmid_dataset <- unlist(lapply(1:length(dataset_new), 
-                              function(x) substr(names(dataset_new)[x], start = 30, stop = 37)))
+pmid_dataset <- index_new$PMID
 
 # Get PMIDs from 'dataset_tests_final'
 pmid_dataset_tests <- unlist(lapply(1:length(dataset_tests_final), 
@@ -176,7 +186,7 @@ pmid_position <- match(pmid_dataset_tests, pmid_dataset)
 diss_dataset_restr <- lapply(pmid_position, function(x) subset(dissimilarities[[x]]$Total_dissimilarity, index_type == "Between-comparison"))
 
 # Restrict datasets with their thresholds to 'pmid_dataset_tests'
-dataset_threshold_restr <- subset(dataset_threshold(dataset_new), is.element(PMID, pmid_dataset_tests))
+dataset_threshold_restr <- subset(dataset_threshold(dataset_new, index_new), is.element(PMID, pmid_dataset_tests))
 
 # Keep 'between-comparison dissimilarities' per analysed network
 diss_dataset_restr_fin <- lapply(diss_dataset_restr, function(x) x[, 2])
