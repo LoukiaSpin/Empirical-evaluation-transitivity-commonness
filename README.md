@@ -28,4 +28,4 @@ Prerequisite R packages: [dplyr](https://CRAN.R-project.org/package=dplyr),
 
 ## Important note
 
-Use the __version 1__ of [tracenma](https://CRAN.R-project.org/package=tracenma) to reproduce the results of the submitted article.
+Use the __version 1__ of [tracenma](https://CRAN.R-project.org/package=tracenma) (package source:  tracenma_0.1.0.zip) to reproduce the results of the submitted article.

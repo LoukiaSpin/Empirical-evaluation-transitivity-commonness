@@ -319,3 +319,18 @@ ggarrange(barplot_second, barplot_third,
           common.legend = TRUE,
           legend = "bottom")
 dev.off()
+
+
+## Some results in the fourth paragraph of Discussion ----
+#' Number of analysed characteristics per network 
+#' (after removing those with undefined p-value in one-way ANOVA)
+analysed_chars_per_dataset <- num_chars_initial - num_undefined_ftests_net
+
+# Summary of analysed characteristics
+summary(analysed_chars_per_dataset)
+
+# Family-wise error rate (FWER) per dataset (alpha = 0.05)
+fmer <- 1 - (1 - 0.05) ^ analysed_chars_per_dataset
+
+# Summary of FWER 
+summary(fmer)
