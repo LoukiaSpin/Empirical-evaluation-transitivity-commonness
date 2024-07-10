@@ -57,12 +57,12 @@ objective_out <-
   stat_function(fun = function(z) {(1 / dataset_dist[1, 3]) * dt((z - dataset_dist[1, 2]) / dataset_dist[1, 3], df = 5)}, 
                 xlim = c(log(5e-05 / (1 - 5e-05)), log(0.01 / (1 - 0.01))),
                 geom = "area",
-                fill = "#D55E00") +
+                fill = "#D55E00",
+                alpha = 0.5) +
   stat_function(fun = function(z) {(1 / dataset_dist[1, 3]) * dt((z - dataset_dist[1, 2]) / dataset_dist[1, 3], df = 5)}, 
-                xlim = c(-15, log(0.0007 / (1 - 0.0007))),
+                xlim = c(log(0.0007 / (1 - 0.0007)), log(0.00074 / (1 - 0.00074))),
                 geom = "area",
-                fill = "#009E73",
-                alpha = 0.4) +
+                fill = "white") +
   stat_function(fun = function(z) {(1 / dataset_dist[1, 3]) * dt((z - dataset_dist[1, 2]) / dataset_dist[1, 3], df = 5)}, 
                 col = "black", 
                 linewidth = 1.3) +
@@ -86,12 +86,12 @@ semi_objective_out <-
   stat_function(fun = function(z) {(1 / dataset_dist[2, 3]) * dt((z - dataset_dist[2, 2]) / dataset_dist[2, 3], df = 5)}, 
                 xlim = c(log(0.01 / (1 - 0.01)), log(0.27 / (1 - 0.27))),
                 geom = "area",
-                fill = "#D55E00") +
+                fill = "#D55E00",
+                alpha = 0.5) +
   stat_function(fun = function(z) {(1 / dataset_dist[2, 3]) * dt((z - dataset_dist[2, 2]) / dataset_dist[2, 3], df = 5)}, 
-                xlim = c(-15, log(0.06 / (1 - 0.06))),
+                xlim = c(log(0.06 / (1 - 0.06)), log(0.063 / (1 - 0.063))),
                 geom = "area",
-                fill = "#009E73",
-                alpha = 0.4) +
+                fill = "white") +
   stat_function(fun = function(z) {(1 / dataset_dist[2, 3]) * dt((z - dataset_dist[2, 2]) / dataset_dist[2, 3], df = 5)}, 
                 col = "black", 
                 linewidth = 1.3) +
@@ -115,12 +115,12 @@ subjective_out <-
   stat_function(fun = function(z) {(1 / dataset_dist[3, 3]) * dt((z - dataset_dist[3, 2]) / dataset_dist[3, 3], df = 5)}, 
                 xlim = c(log(0.09 / (1 - 0.09)), log(0.52 / (1 - 0.52))),
                 geom = "area",
-                fill = "#D55E00") +
+                fill = "#D55E00",
+                alpha = 0.5) +
   stat_function(fun = function(z) {(1 / dataset_dist[3, 3]) * dt((z - dataset_dist[3, 2]) / dataset_dist[3, 3], df = 5)}, 
-                xlim = c(-15, log(0.25 / (1 - 0.25))),
+                xlim = c(log(0.25 / (1 - 0.25)), log(0.255 / (1 - 0.255))),
                 geom = "area",
-                fill = "#009E73",
-                alpha = 0.4) +
+                fill = "white") +
   stat_function(fun = function(z) {(1 / dataset_dist[3, 3]) * dt((z - dataset_dist[3, 2]) / dataset_dist[3, 3], df = 5)}, 
                 col = "black", 
                 linewidth = 1.3) +
@@ -144,12 +144,12 @@ general_out <-
   stat_function(fun = function(z) {(1 / dataset_dist[4, 3]) * dt((z - dataset_dist[4, 2]) / dataset_dist[4, 3], df = 5)}, 
                 xlim = c(log(0.02 / (1 - 0.02)), log(0.53 / (1 - 0.53))),
                 geom = "area",
-                fill = "#D55E00") +
+                fill = "#D55E00",
+                alpha = 0.5) +
   stat_function(fun = function(z) {(1 / dataset_dist[4, 3]) * dt((z - dataset_dist[4, 2]) / dataset_dist[4, 3], df = 5)}, 
-                xlim = c(-15, log(0.13 / (1 - 0.13))),
+                xlim = c(log(0.13 / (1 - 0.13)), log(0.135 / (1 - 0.135))),
                 geom = "area",
-                fill = "#009E73",
-                alpha = 0.4) +
+                fill = "white") +
   stat_function(fun = function(z) {(1 / dataset_dist[4, 3]) * dt((z - dataset_dist[4, 2]) / dataset_dist[4, 3], df = 5)}, 
                 col = "black", 
                 linewidth = 1.3) +

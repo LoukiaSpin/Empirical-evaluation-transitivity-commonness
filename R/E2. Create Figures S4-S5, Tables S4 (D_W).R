@@ -195,7 +195,7 @@ thres_within_75 <-
 
 # Merge '50% threshold' and '75% threshold'
 thres_within_plot <- data.frame(rbind(thres_within_50, thres_within_75),
-                                rep(c("Second quartile", "Third quartile"), each = dim(thres_within_50)[1]))
+                                rep(c("Median", "Third quartile"), each = dim(thres_within_50)[1]))
 colnames(thres_within_plot)[6] <- "threshold"
 
 # Create grouped barplot 

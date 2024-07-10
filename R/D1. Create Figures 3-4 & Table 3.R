@@ -160,7 +160,7 @@ transit_75 <-
 
 # Merge '50% threshold' and '75% threshold'
 transit_plot <- data.frame(rbind(transit_50, transit_75),
-                           rep(c("Second quartile", "Third quartile"), c(dim(transit_50)[1], dim(transit_75)[1])))
+                           rep(c("Median", "Third quartile"), c(dim(transit_50)[1], dim(transit_75)[1])))
 colnames(transit_plot)[6] <- "threshold"
 
 # Create grouped barplot 
@@ -244,13 +244,13 @@ length(table(intransit_comp_75$network_id))  # 188 (87.8%)
 
 # Merge '50% threshold' and '75% threshold'
 intransit_comp_plot <- data.frame(rbind(intransit_comp_50, intransit_comp_75),
-                                  rep(c("Second quartile", "Third quartile"), 
+                                  rep(c("Median", "Third quartile"), 
                                       c(dim(intransit_comp_50)[1], dim(intransit_comp_75)[1])))
 colnames(intransit_comp_plot)[8] <- "threshold"
 
 # Merge number of networks under '50% threshold' and '75% threshold'
 num_intrans_net <- data.frame(rbind(num_intrans_net_50, num_intrans_net_75),
-                              rep(c("Second quartile", "Third quartile"), 
+                              rep(c("Median", "Third quartile"), 
                                   c(dim(num_intrans_net_50)[1], dim(num_intrans_net_75)[1])))
 colnames(num_intrans_net)[5] <- "threshold"
 

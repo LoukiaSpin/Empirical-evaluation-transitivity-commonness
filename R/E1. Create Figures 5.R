@@ -238,7 +238,7 @@ data_trans_concl <-
                        sign_low_third, nonsign_low_third, sign_high_third, nonsign_high_third),
              pvalue = rep(c("Conclusive", "Inconclusive"), 4),
              dissimilarity = rep(c("Transitivity is likely", "Transitivity is questionable"), each = 2),
-             threshold = rep(c("Second quartile", "Third quartile"), each = 4))
+             threshold = rep(c("Median", "Third quartile"), each = 4))
 
 # Calculate % conditionally on p-value decision
 data_trans_concl_new <- data_trans_concl %>%
@@ -247,7 +247,7 @@ data_trans_concl_new <- data_trans_concl %>%
 
 # Create stacked barplot (second quartile for threshold)
 barplot_second <-
-  ggplot(subset(data_trans_concl_new, threshold == "Second quartile"),
+  ggplot(subset(data_trans_concl_new, threshold == "Median"),
        aes(x = pvalue,
            y = perc,
            fill = dissimilarity)) +
@@ -265,7 +265,7 @@ barplot_second <-
   labs(x = "Statistical test of transitivity was",
        y = "Percentage datasets (%)",
        fill = "Novel approach decision") +
-  ggtitle("Dissimilarity threshold: second quartile") +
+  ggtitle("Dissimilarity threshold: median") +
   scale_fill_manual(values = c("#009E73", "#D55E00")) +
   scale_y_continuous(labels = scales::label_percent(suffix = " ")) +
   theme_classic() +
