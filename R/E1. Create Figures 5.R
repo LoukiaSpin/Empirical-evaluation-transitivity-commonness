@@ -63,29 +63,43 @@ dissimilarities <- dissimilarities[-excluded_datasets]
 dataset_test <- dataset_tests(dataset_new0)$dataset_new_final
 names(dataset_test) <- names(dataset_new)
 
-#' Next, remove datasets with at least one single-study comparison as 'oneway.test' cannot run 
-#' (Error: 'not enough observations') and 'chisq.test' warns 'Chi-squared approximation may be incorrect' 
-dataset_tests_final0 <- Filter(function(x) {length(which(table(x[, "Comparison"]) == 1)) == 0}, dataset_test)
+#' Number of single-study comparisons per dataset
+single_comp <- unname(unlist(sapply(dataset_test, 
+                                    function(x) length(which(table(paste(x[, 3], "vs", x[, 2])) == 1)))))
 
-# Number of datasets removed from previous step (they have at least one single-study comparison)
-length(dataset_test) - length(dataset_tests_final0) # 178 datasets!!
+#' Remove numeric characteristics as 'oneway.test' cannot run (Error: 'not enough observations') 
+single_comp_remove <- lapply(dataset_test[which(single_comp > 0)], function(x) {x <- x[,!(names(x) %in% names(which(lapply(x, typeof) == "double")))]; x})
 
-#' Lastly, remove categorical characteristics with only one value for all trials, as 'chisq.test' is undefined (X-squared = NaN)
-dataset_tests_final <- 
-  lapply(dataset_tests_final0, function(x) {x <- x[,!(names(x) %in% names(which(apply(x[-c(1:3)], 2, function(y) length(unique(y))) == 1)))]; x})
+#' Replace 'dataset_test' with the corresponding datasets found in 'single_comp_remove'
+dataset_test[which(single_comp > 0)] <- single_comp_remove; dataset_test
 
-# Vector of removed characteristics per analysed dataset
-chars_removed_per_dataset0 <- 
-  unname(unlist(lapply(dataset_tests_final0, function(x) dim(x)[2])) - 
-           unlist(lapply(dataset_tests_final, function(x) dim(x)[2])))
+#' Next, remove datasets with less than four characteristics after removing the numeric ones.
+dataset_tests_final00 <- 
+  dataset_test[unlist(sapply(dataset_test, function(x) dim(as.data.frame(x[, -c(1:3)]))[2] - 1)) > 3] 
 
-# SOS: Exclude the 16th dataset that had one numeric variable with same values across all studies
-chars_removed_per_dataset <- chars_removed_per_dataset0[-16]
+# Number of datasets removed from previous step (they have less than four characteristics)
+length(dataset_test) - length(dataset_tests_final00) # 67 datasets!!
 
-# Descriptive statistics on removed categorical characteristics with same valua in all trials
+#' Lastly, remove characteristics with only one value for all trials, as neither test is defined 
+dataset_tests_final0 <- 
+  lapply(dataset_tests_final00, function(x) {x <- x[,!(names(x) %in% names(which(apply(x[-c(1:3)], 2, function(y) length(unique(na.omit(y)))) == 1)))]; x})
+
+#' Remove datasets with less than 4 characteristic after the previous step
+dataset_tests_final <- dataset_tests_final0[unlist(sapply(dataset_tests_final0, function(x) dim(as.data.frame(x[, -c(1:3)]))[2] - 1)) > 3] 
+
+#' Further excluded dataets for having less than 4 charactersitics
+length(dataset_tests_final0) - length(dataset_tests_final)
+
+# Vector of removed characteristics per analysed dataset (127 analysed datasets according to length(dataset_tests_final))
+chars_removed_per_dataset <- 
+  unname(unlist(lapply(dataset_tests_final00, function(x) dim(x)[2])) - 
+           unlist(lapply(dataset_tests_final0, function(x) dim(x)[2])))[
+             which(unlist(sapply(dataset_tests_final0, function(x) dim(as.data.frame(x[, -c(1:3)]))[2] - 1)) > 3)]
+
+# Descriptive statistics on removed categorical characteristics with same value in all studies
 sum(chars_removed_per_dataset)
 summary(chars_removed_per_dataset[chars_removed_per_dataset > 0]) # 1 to 8 characteristics were removed ...
-length(chars_removed_per_dataset[chars_removed_per_dataset > 0])  # ... from 12 datasets
+length(chars_removed_per_dataset[chars_removed_per_dataset > 0])  # ... from 60 datasets
 
 
 
@@ -144,7 +158,7 @@ length(num_undefined_ftests_net[num_undefined_ftests_net > 0])
 
 
 
-## Investigate the number of analysed characteristics in the 31 'eligible' datasets ----
+## Investigate the number of analysed characteristics in the 217 'eligible' datasets ----
 # % analysed characteristics per network 
 perc_chars_analysed <- (num_chars_initial - num_undefined_ftests_net) / num_chars_initial
 
@@ -167,7 +181,7 @@ test_trans_result <- ifelse(stat_sign_char_net > 0, "conclusive", "inconclusive"
 
 # Number of networks with conclusive results
 #' At least one characteristic was associated with p-value < 5%
-length(which(test_trans_result == "conclusive"))  # 19 networks (out of 31) - The remaining 12 had *only* inconclusive results!
+length(which(test_trans_result == "conclusive"))  # 62 networks (out of 127) - The remaining 65 had *only* inconclusive results!
 
 
 

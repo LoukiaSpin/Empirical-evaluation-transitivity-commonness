@@ -103,6 +103,9 @@ dataset_tests <- function (dataset) {
     length(unique(unlist(x)))
   }))
   
+  #' Summary statistics of % dropped characteristics across the datasets
+  perc_drop_chars <- lapply(dropped_char/num_chars, function(x) summary(x))
+  
   #' Get the dataset(s) with less than 4 characteristics
   exclude_datasets <- which(num_chars - dropped_char < 4) # 64 102 107 122 168
   
@@ -110,7 +113,8 @@ dataset_tests <- function (dataset) {
   dataset_new_final <- dataset_new_final0[-exclude_datasets]
   
   return(list(dataset_new_final = dataset_new_final,
-              exclude_datasets = exclude_datasets))
+              exclude_datasets = exclude_datasets,
+              perc_drop_chars = perc_drop_chars))
 }
 
 
