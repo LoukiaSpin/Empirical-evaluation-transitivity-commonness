@@ -13,7 +13,12 @@ get_dataset_new <- function (read_all_excels) {
   ## Dataset preparation
   # STEP 0: Remove columns relating to dose characteristics
   dataset_start <- lapply(read_all_excels, 
-                          function(x) x[!names(x) %in% names(x[, startsWith(names(x), "treat.dos") | 
+                          function(x) x[!names(x) %in% names(x[, startsWith(names(x), "max.treat.time.first.drug.administration") |
+                                                                 startsWith(names(x), "min.treat.time.first.drug.administration") |
+                                                                 startsWith(names(x), "time.first.drug.administration") |
+                                                                 startsWith(names(x), "min.treat.dose") |
+                                                                 startsWith(names(x), "max.treat.dose") |
+                                                                 startsWith(names(x), "treat.dos") | 
                                                                  startsWith(names(x), "treat.type") | 
                                                                  startsWith(names(x), "treat.interval") | 
                                                                  startsWith(names(x), "treat.route") | 
@@ -92,7 +97,7 @@ dataset_tests <- function (dataset) {
   names(dataset_new_final0) <- names(dataset)
   
   
-  ## Keep only datasets with at least four charactersitics after dropping those with too many missing data
+  ## Keep only datasets with at least four characteristics after dropping those with too many missing data
   #' Number of characteristics per dataset (before dropping those with too many missing data)
   num_chars <- unname(unlist(lapply(dataset_new, function(x) dim(x[, -c(1:3)])[2] - 1)))
   

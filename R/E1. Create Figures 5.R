@@ -5,7 +5,7 @@
 #*              (Statistical testing for transitivity assessment)                                                                                                                                                                                                                                       
 #*                
 #* Author: Loukia M. Spineli 
-#* Date: March 2024
+#* Date: July 2024
 #*******************************************************************************
 
 
@@ -87,19 +87,19 @@ dataset_tests_final0 <-
 #' Remove datasets with less than 4 characteristic after the previous step
 dataset_tests_final <- dataset_tests_final0[unlist(sapply(dataset_tests_final0, function(x) dim(as.data.frame(x[, -c(1:3)]))[2] - 1)) > 3] 
 
-#' Further excluded dataets for having less than 4 charactersitics
-length(dataset_tests_final0) - length(dataset_tests_final)
-
 # Vector of removed characteristics per analysed dataset (127 analysed datasets according to length(dataset_tests_final))
 chars_removed_per_dataset <- 
   unname(unlist(lapply(dataset_tests_final00, function(x) dim(x)[2])) - 
            unlist(lapply(dataset_tests_final0, function(x) dim(x)[2])))[
              which(unlist(sapply(dataset_tests_final0, function(x) dim(as.data.frame(x[, -c(1:3)]))[2] - 1)) > 3)]
 
-# Descriptive statistics on removed categorical characteristics with same value in all studies
+# Descriptive statistics on removed characteristics with same value in all studies
 sum(chars_removed_per_dataset)
 summary(chars_removed_per_dataset[chars_removed_per_dataset > 0]) # 1 to 8 characteristics were removed ...
 length(chars_removed_per_dataset[chars_removed_per_dataset > 0])  # ... from 60 datasets
+
+#' Further excluded dataets for having less than 4 charactersitics
+length(dataset_tests_final0) - length(dataset_tests_final)
 
 
 
@@ -158,7 +158,7 @@ length(num_undefined_ftests_net[num_undefined_ftests_net > 0])
 
 
 
-## Investigate the number of analysed characteristics in the 217 'eligible' datasets ----
+## Investigate the number of analysed characteristics in the 127 'eligible' datasets ----
 # % analysed characteristics per network 
 perc_chars_analysed <- (num_chars_initial - num_undefined_ftests_net) / num_chars_initial
 
@@ -336,15 +336,20 @@ dev.off()
 
 
 ## Some results in the fourth paragraph of Discussion ----
-#' Number of analysed characteristics per network 
-#' (after removing those with undefined p-value in one-way ANOVA)
-analysed_chars_per_dataset <- num_chars_initial - num_undefined_ftests_net
+# Number of characteristics across 127 datasets where the approach of study dissimilarities was applied 
+num_chars_diss <- unlist(lapply(1:length(pmid_position), function(x) dim(dissimilarities[[pmid_position[x]]]$Types_used)[1]))
 
-# Summary of analysed characteristics
-summary(analysed_chars_per_dataset)
+# Percentage of characteristics lost from these 127 datasets due to testing-related issues
+perc_lost_chars_per_dataset <- ((num_chars_diss - (num_chars_initial - num_undefined_ftests_net)) / num_chars_diss) * 100
+
+# Summary of percentage lost characteristics
+summary(perc_lost_chars_per_dataset[perc_lost_chars_per_dataset > 0])
+
+# Percentage networks losing some of the original characteristics
+(length(perc_lost_chars_per_dataset[perc_lost_chars_per_dataset > 0]) / 127) * 100
 
 # Family-wise error rate (FWER) per dataset (alpha = 0.05)
-fmer <- 1 - (1 - 0.05) ^ analysed_chars_per_dataset
+fmer <- 1 - (1 - 0.05) ^ (num_chars_initial - num_undefined_ftests_net) # Based on the analysed characteristics
 
 # Summary of FWER 
 summary(fmer)
