@@ -66,6 +66,7 @@ names(dataset_test) <- names(dataset_new)
 #' Number of single-study comparisons per dataset
 single_comp <- unname(unlist(sapply(dataset_test, 
                                     function(x) length(which(table(paste(x[, 3], "vs", x[, 2])) == 1)))))
+length(single_comp[single_comp > 0]) # 178 datasets with single-study comparisons
 
 #' Remove numeric characteristics as 'oneway.test' cannot run (Error: 'not enough observations') 
 single_comp_remove <- lapply(dataset_test[which(single_comp > 0)], function(x) {x <- x[,!(names(x) %in% names(which(lapply(x, typeof) == "double")))]; x})
