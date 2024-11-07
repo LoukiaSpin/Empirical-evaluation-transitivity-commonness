@@ -77,7 +77,7 @@ summary(num_chars)
 num_numer_chars <- sapply(dataset_new, function(x) length(which(lapply(x, typeof) == "double")))
 perc_numer_chars <- round((num_numer_chars / num_chars) * 100, 0)
 summary(perc_numer_chars)
-length(which(perc_numer_chars == 100)) # 26 networks contained only numeric characteristics
+length(which(perc_numer_chars == 100)) # 27 networks contained only numeric characteristics
 length(which(perc_numer_chars == 0))   # 1 network did not contain any numeric characteristics
 
 # Percentage of non-numeric characteristics
@@ -85,7 +85,7 @@ num_nonnumer_chars <- sapply(dataset_new, function(x) length(which(lapply(x, typ
 perc_nonnumer_chars <- round((num_nonnumer_chars / num_chars) * 100, 0)
 summary(perc_nonnumer_chars)
 length(which(perc_nonnumer_chars == 100)) # 1 network contained only non-numeric characteristics
-length(which(perc_nonnumer_chars == 0))   # 26 networks did not contain any non-numeric characteristics
+length(which(perc_nonnumer_chars == 0))   # 27 networks did not contain any non-numeric characteristics
 
 # Percentage of total missing data
 perc_miss_total <- 
